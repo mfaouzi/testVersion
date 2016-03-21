@@ -1,0 +1,75 @@
+Aliznet
+  |
+  |
+  |____WCSBundle
+		   |
+		   |____Entity
+				  |
+				  |____Category.php
+				  |____CategoryTranslation.php
+				  |____Attribute.php
+		   |____Processor
+				  |
+				  |____CategoryProcessor.php
+				  |____AttributeProcessor.php
+				  |____AttributeValuesProcessor.php
+		   |____Reader
+				  |
+				  |____Doctrine
+				  |		  |
+				  |		  |____ProductReader.php
+				  |____ORM
+						|
+						|____CategoryReader.php
+						|____AttributeReader.php
+						|____AttributeValuesReader.php
+		   |____Resources
+					|
+					|____translations
+					|		  |
+					|		  |____messages.en.yml
+					|____config
+						   |
+						   |____doctrine
+						   |	   |
+						   |	   |____Category.orm.yml
+						   |       |____CategoryTranslation.orm.yml
+						   |
+						   |____writers.yml
+						   |____services.yml
+						   |____batch_jobs.yml
+						   |____readers.yml
+						   |____entities.yml
+						   |____processors.yml
+					|____Constant
+						   |____Constants.php
+		   |____Writer
+				  |
+				  |____File
+						|____CategoryFileWriter.php
+						|____AttributeWriter.php
+						|____CsvWriter.php
+						|____FileWriter.php	
+  |____EnrichBundle
+			  |
+			  |____Form
+					 |
+					 |____Type
+							|
+							|____CategoryType.php
+			  |____Resources
+					   |
+					   |____config
+					   |	  |
+					   |	  |____form_types.yml
+					   |	  |____routing.yml
+					   |	  |____services.yml
+					   |____views
+							  |
+							  |____CategoryTree
+										|
+										|____Tab
+											  |
+											  |____property.html.twig										  					
+					 
+									  
