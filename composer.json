@@ -1,0 +1,31 @@
+{
+  "name": "aliznet/aliznet-wcs-connector",
+  "description": "The Websphere Commerce Connector for Akeneo"
+  "license": "OSL-3.0",
+  "type":"aliznet-module",
+  "authors": [
+        {
+            "name": "Aliznet",
+            "homepage": "http://www.aliznet.fr"
+        }
+    ],
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "https://github.com/hicham-sabihi/aliznet_wcs_connector.git",
+      "branch": "master"
+    }
+  ],
+  "require": {
+    "akeneo/pim-community-dev": "1.5.*",
+    "doctrine/migrations": "1.0.0-alpha3@alpha"
+  },
+  "require-dev": {
+    "fabpot/php-cs-fixer": "^1.11"
+  },
+  "autoload": {
+    "psr-4": {
+      "": "src"
+    }
+  }
+}
