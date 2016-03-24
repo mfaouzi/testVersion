@@ -6,11 +6,13 @@ use Doctrine\ORM\EntityManager;
 use Pim\Bundle\BaseConnectorBundle\Reader\Doctrine\Reader;
 
 /**
+ * Product Reader.
+ *
  * @author    aliznet
  * @copyright 2016 ALIZNET (www.aliznet.fr)
  */
-class AttributeReader extends Reader {
-
+class AttributeReader extends Reader
+{
     /**
      * @var EntityManager
      */
@@ -48,102 +50,114 @@ class AttributeReader extends Reader {
 
     /**
      * @param EntityManager $em        The entity manager
-     * 
      * @param string        $className The entity class name used
      */
-    public function __construct(EntityManager $em, $className) {
+    public function __construct(EntityManager $em, $className)
+    {
         $this->em = $em;
         $this->className = $className;
         $this->groupNumber = 0;
     }
 
     /**
-     * get attributes
+     * get attributes.
      *
      * @return string attributes
      */
-    public function getAttributes() {
+    public function getAttributes()
+    {
         return $this->attributes;
     }
 
     /**
-     * Set attributes
+     * Set attributes.
      *
      * @param string $attributes attributes
      *
      * @return AbstractProcessor
      */
-    public function setAttributes($attributes) {
+    public function setAttributes($attributes)
+    {
         $this->attributes = $attributes;
+
         return $this;
     }
 
     /**
-     * get includeexclude
+     * get includeexclude.
      *
      * @return string includeexclude
      */
-    public function getIncludeexclude() {
+    public function getIncludeexclude()
+    {
         return $this->includeexclude;
     }
 
     /**
-     * Set includeexclude
+     * Set includeexclude.
      *
      * @param string $includeexclude includeexclude
      *
      * @return AbstractProcessor
      */
-    public function setIncludeexclude($includeexclude) {
+    public function setIncludeexclude($includeexclude)
+    {
         $this->includeexclude = $includeexclude;
     }
 
     /**
-     * get language
+     * get language.
      *
      * @return string language
      */
-    public function getLanguage() {
+    public function getLanguage()
+    {
         return $this->language;
     }
 
     /**
-     * Set language
+     * Set language.
      *
      * @param string $language language
      *
      * @return AbstractProcessor
      */
-    public function setLanguage($language) {
+    public function setLanguage($language)
+    {
         $this->language = $language;
+
         return $this;
     }
 
     /**
-     * {@inheritdoc}
+     * @return query
      */
-    public function getQuery() {
+    public function getQuery()
+    {
         $qb = $this->em
                 ->getRepository($this->className)
                 ->createQueryBuilder('a')
-                ->leftJoin('a.translations', 'at', 'WITH', 'at.locale=' . '\'' . $this->getLanguage() . '\'');
+                ->leftJoin('a.translations', 'at', 'WITH', 'at.locale='.'\''.$this->getLanguage().'\'');
 
         $this->QueryExludedWCSFields($qb);
         $this->QueryAttributes($qb);
         $this->query = $qb->getQuery();
+
         return $this->query;
     }
 
-    /*
+    /**
+     * Exclude WCS fileds from attributes export.
      *
-     * Exclude WCS fileds from attributes export 
-     *  
+     * @param query $qb
+     *
+     * @return query
      */
-
-    public function QueryExludedWCSFields($qb) {
+    public function QueryExludedWCSFields($qb)
+    {
         $filename = 'exluded_atrributes.txt';
         $dir = dirname(dirname(dirname(dirname(dirname(dirname(__FILE__))))));
-        $file = $dir . '/web/WCS/' . $filename;
+        $file = $dir.'/web/WCS/'.$filename;
         if (file_exists($file) && file($file)) {
             $lines = file($file);
             $fields = str_replace(array("\r\n", "\n", "\r"), '', $lines);
@@ -152,67 +166,70 @@ class AttributeReader extends Reader {
         } else {
             $this->wcs = false;
         }
+
         return $qb;
     }
 
-    /*
+    /**
+     * Include or exclude attributes in the configuration field from export.
      *
-     * Include or exclude attributes in the configuration field from export 
-     *  
+     * @param query $qb
+     *
+     * @return query
      */
-
-    public function QueryAttributes($qb) {
+    public function QueryAttributes($qb)
+    {
         $include_exclude = $this->getIncludeexclude();
         $attributes = $this->getAttributes();
         $attributes_config = explode(',', $attributes);
-
 
         $condition = 'Where';
         if ($this->wcs) {
             $condition = 'andWhere';
         }
         if (!empty($include_exclude)) {
-            switch ($include_exclude):
+            switch ($include_exclude) {
                 case 'Exclude' :
                     $qb->$condition($qb->expr()->orX($qb->expr()->notIn('a.code', $attributes_config)));
                     break;
                 case 'Include':
                     $qb->$condition($qb->expr()->orX($qb->expr()->in('a.code', $attributes_config)));
                     break;
-            endswitch;
+            }
         }
+
         return $qb;
     }
 
     /**
-     * {@inheritdoc}
+     * @return array
      */
-    public function getConfigurationFields() {
+    public function getConfigurationFields()
+    {
         return array(
             'includeexclude' => array(
-                'type' => 'choice',
+                'type'    => 'choice',
                 'options' => array(
-                    'choices' => array('Exclude' => 'Exclude', 'Include' => 'Include',),
+                    'choices'  => array('Exclude' => 'Exclude', 'Include' => 'Include'),
                     'required' => false,
-                    'label' => 'aliznet_wcs_export.export.includeexclude.label',
-                    'help' => 'aliznet_wcs_export.export.includeexclude.help'
-                )
+                    'label'    => 'aliznet_wcs_export.export.includeexclude.label',
+                    'help'     => 'aliznet_wcs_export.export.includeexclude.help',
+                ),
             ),
             'attributes' => array(
                 'options' => array(
                     'required' => false,
-                    'label' => 'aliznet_wcs_export.export.Attributes.label',
-                    'help' => 'aliznet_wcs_export.export.Attributes.help'
-                )
+                    'label'    => 'aliznet_wcs_export.export.Attributes.label',
+                    'help'     => 'aliznet_wcs_export.export.Attributes.help',
+                ),
             ),
             'language' => array(
                 'options' => array(
                     'required' => true,
-                    'label' => 'aliznet_wcs_export.export.language.label',
-                    'help' => 'aliznet_wcs_export.export.language.help'
-                )
-            )
+                    'label'    => 'aliznet_wcs_export.export.language.label',
+                    'help'     => 'aliznet_wcs_export.export.language.help',
+                ),
+            ),
         );
     }
-
 }

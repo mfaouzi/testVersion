@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * AliznetEnrichBundle.
+ *
  * @author    aliznet
  * @copyright 2016 ALIZNET (www.aliznet.fr)
  */

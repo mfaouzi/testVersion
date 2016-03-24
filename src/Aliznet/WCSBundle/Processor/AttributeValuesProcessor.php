@@ -2,15 +2,17 @@
 
 namespace Aliznet\WCSBundle\Processor;
 
-use Akeneo\Bundle\BatchBundle\Item\ItemProcessorInterface;
-use Akeneo\Bundle\BatchBundle\Item\AbstractConfigurableStepElement;
+use Akeneo\Component\Batch\Item\AbstractConfigurableStepElement;
+use Akeneo\Component\Batch\Item\ItemProcessorInterface;
 
 /**
+ * Attribute Values Processor.
+ *
  * @author    aliznet
  * @copyright 2016 ALIZNET (www.aliznet.fr)
  */
-class AttributeValuesProcessor extends AbstractConfigurableStepElement implements ItemProcessorInterface {
-
+class AttributeValuesProcessor extends AbstractConfigurableStepElement implements ItemProcessorInterface
+{
     /**
      * @var string
      */
@@ -22,29 +24,34 @@ class AttributeValuesProcessor extends AbstractConfigurableStepElement implement
     protected $language;
 
     /**
-     * get language
+     * get language.
      *
      * @return string language
      */
-    public function getLanguage() {
+    public function getLanguage()
+    {
         return $this->language;
     }
 
     /**
-     * Set exportedAttributes
+     * Set exportedAttributes.
+     *
      * @return string $language language
      */
-    public function setLanguage($language) {
+    public function setLanguage($language)
+    {
         $this->language = $language;
 
         return $this;
     }
 
     /**
-     * {@inheritdoc}
+     * @param Attribute $item
+     *
+     * @return array
      */
-    public function process($item) {
-
+    public function process($item)
+    {
         $result = array();
         $i = 0;
         foreach ($item->getOptionValues() as $value) {
@@ -54,24 +61,25 @@ class AttributeValuesProcessor extends AbstractConfigurableStepElement implement
             $result[$i]['value'] = $value->getValue();
             $result[$i]['LanguageId'] = $value->getLocale();
             $result[$i]['Delete'] = '';
-            $i++;
+            ++$i;
         }
+
         return $result;
     }
 
     /**
-     * {@inheritdoc}
+     * @return array
      */
-    public function getConfigurationFields() {
+    public function getConfigurationFields()
+    {
         return array(
             'language' => array(
                 'options' => array(
                     'required' => false,
-                    'label' => 'aliznet_wcs_export.export.language.label',
-                    'help' => 'aliznet_wcs_export.export.language.help'
-                )
-            )
+                    'label'    => 'aliznet_wcs_export.export.language.label',
+                    'help'     => 'aliznet_wcs_export.export.language.help',
+                ),
+            ),
         );
     }
-
 }

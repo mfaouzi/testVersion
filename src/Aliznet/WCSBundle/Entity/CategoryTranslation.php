@@ -5,55 +5,108 @@ namespace Aliznet\WCSBundle\Entity;
 use Pim\Bundle\CatalogBundle\Entity\CategoryTranslation as BaseCategoryTranslation;
 
 /*
- * Category translation entity
+ * CategoryTranslation entity
  * @author    aliznet
- * @copyright ALIZNET (http://www.aliznet.fr/)
+ * @copyright 2016 ALIZNET (http://www.aliznet.fr/)
  * 
  */
 
-class CategoryTranslation extends BaseCategoryTranslation {
+class CategoryTranslation extends BaseCategoryTranslation
+{
     /**
-     * All required columns are mapped through inherited superclass
+     * @var string
      */
-   
     protected $name;
+    /**
+     * @var string
+     */
     protected $description;
+    /**
+     * @var string
+     */
     protected $longDescription;
+    /**
+     * @var string
+     */
     protected $keyword;
-    
-    public function getName() {
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
         return $this->name;
     }
 
-    public function getDescription() {
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
         return $this->description;
     }
 
-    public function getLongDescription() {
+    /**
+     * @return string
+     */
+    public function getLongDescription()
+    {
         return $this->longDescription;
     }
 
-    public function getKeyword() {
+    /**
+     * @return string
+     */
+    public function getKeyword()
+    {
         return $this->keyword;
     }
 
-    public function setName($name) {
+    /**
+     * @param type $name
+     *
+     * @return \Aliznet\WCSBundle\Entity\CategoryTranslation
+     */
+    public function setName($name)
+    {
         $this->name = $name;
+
         return $this;
     }
 
-    public function setDescription($description) {
+    /**
+     * @param type $description
+     *
+     * @return \Aliznet\WCSBundle\Entity\CategoryTranslation
+     */
+    public function setDescription($description)
+    {
         $this->description = $description;
+
         return $this;
     }
 
-    public function setLongDescription($longDescription) {
+    /**
+     * @param type $longDescription
+     *
+     * @return \Aliznet\WCSBundle\Entity\CategoryTranslation
+     */
+    public function setLongDescription($longDescription)
+    {
         $this->longDescription = $longDescription;
+
         return $this;
     }
 
-    public function setKeyword($keyword) {
+    /**
+     * @param type $keyword
+     *
+     * @return \Aliznet\WCSBundle\Entity\CategoryTranslation
+     */
+    public function setKeyword($keyword)
+    {
         $this->keyword = $keyword;
+
         return $this;
     }
 }

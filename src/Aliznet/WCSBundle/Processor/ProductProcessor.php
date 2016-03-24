@@ -2,15 +2,17 @@
 
 namespace Aliznet\WCSBundle\Processor;
 
-use Akeneo\Bundle\BatchBundle\Item\ItemProcessorInterface;
-use Akeneo\Bundle\BatchBundle\Item\AbstractConfigurableStepElement;
+use Akeneo\Component\Batch\Item\AbstractConfigurableStepElement;
+use Akeneo\Component\Batch\Item\ItemProcessorInterface;
 
 /**
+ * Product Processor.
+ *
  * @author    aliznet
  * @copyright 2016 ALIZNET (www.aliznet.fr)
  */
-class ProductProcessor extends AbstractConfigurableStepElement implements ItemProcessorInterface {
-
+class ProductProcessor extends AbstractConfigurableStepElement implements ItemProcessorInterface
+{
     /**
      * @var string
      */
@@ -22,19 +24,22 @@ class ProductProcessor extends AbstractConfigurableStepElement implements ItemPr
     protected $language;
 
     /**
-     * get language
+     * get language.
      *
      * @return string language
      */
-    public function getLanguage() {
+    public function getLanguage()
+    {
         return $this->language;
     }
 
     /**
-     * Set exportedAttributes
+     * Set exportedAttributes.
+     *
      * @return string $language language
      */
-    public function setLanguage($language) {
+    public function setLanguage($language)
+    {
         $this->language = $language;
 
         return $this;
@@ -43,7 +48,8 @@ class ProductProcessor extends AbstractConfigurableStepElement implements ItemPr
     /**
      * {@inheritdoc}
      */
-    public function process($item) {
+    public function process($item)
+    {
         /* $result = [];
           $result['Identifier']                        = $item->getCode();
           $result['type']                              = $this->processattributeType($item->getAttributeType());
@@ -60,23 +66,24 @@ class ProductProcessor extends AbstractConfigurableStepElement implements ItemPr
     /**
      * {@inheritdoc}
      */
-    public function getConfigurationFields() {
-        
+    public function getConfigurationFields()
+    {
     }
 
     /**
-     * Get exportedAttributes
+     * Get exportedAttributes.
      * 
      *  @param string $attributetype attributetype
      * 
      * @return string $attributetype attributetype
      */
-    public function processattributeType($attributetype) {
+    public function processattributeType($attributetype)
+    {
         $pim_attribute_type_integer = array('pim_catalog_boolean', 'pim_catalog_number');
         $pim_attribute_type_float = array('pim_catalog_mertic');
         $pim_attribute_type_double = array('pim_catalog_price_collection');
         $pim_attribute_type_string = array('pim_catalog_date', 'pim_catalog_file', 'pim_catalog_identifier', 'pim_catalog_image', 'pim_catalog_multiselect',
-            'pim_catalog_simpleselect', 'pim_catalog_text', 'pim_catalog_textarea');
+            'pim_catalog_simpleselect', 'pim_catalog_text', 'pim_catalog_textarea', );
         if (in_array($attributetype, $pim_attribute_type_integer)) {
             $this->wcsattributetype = 'integer';
         } elseif (in_array($attributetype, $pim_attribute_type_float)) {
@@ -88,7 +95,7 @@ class ProductProcessor extends AbstractConfigurableStepElement implements ItemPr
         } else {
             $this->wcsattributetype = $attributetype;
         }
+
         return $this->wcsattributetype;
     }
-
 }

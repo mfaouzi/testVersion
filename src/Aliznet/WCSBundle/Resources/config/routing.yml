@@ -1,3 +1,0 @@
-aliznet_wcs_homepage:
-    path:     /hello/{name}
-    defaults: { _controller: AliznetWCSBundle:Default:index }

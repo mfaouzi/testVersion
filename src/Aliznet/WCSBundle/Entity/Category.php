@@ -1,33 +1,26 @@
 <?php
 
-/*
- * Entity Category
- *
- * @author    aliznet
- * @copyright 2016 ALIZNET (www.aliznet.fr)
- */
-
 namespace Aliznet\WCSBundle\Entity;
 
 use Akeneo\Component\Classification\Model\Category as BaseCategory;
+use Akeneo\Component\Localization\Model\TranslationInterface;
 use Doctrine\Common\Collections\ArrayCollection;
-use Pim\Bundle\CatalogBundle\Model\CategoryInterface;
-use Pim\Bundle\TranslationBundle\Entity\AbstractTranslation;
+use Pim\Component\Catalog\Model\CategoryInterface;
 
 /*
  * Category entity
- * @author    mfaouzi
- * @copyright ALIZNET (http://www.aliznet.fr/)
+ * @author    aliznet
+ * @copyright 2016 ALIZNET (http://www.aliznet.fr/)
  * 
  */
-class Category extends BaseCategory implements CategoryInterface {
-
+class Category extends BaseCategory implements CategoryInterface
+{
     /** @var ArrayCollection of ProductInterface */
     protected $products;
 
     /**
      * Used locale to override Translation listener's locale
-     * this is not a mapped field of entity metadata, just a simple property
+     * this is not a mapped field of entity metadata, just a simple property.
      *
      * @var string
      */
@@ -51,7 +44,11 @@ class Category extends BaseCategory implements CategoryInterface {
     /** @var \String for full images location */
     protected $fullImage;
 
-    public function __construct() {
+    /**
+     * Construct.
+     */
+    public function __construct()
+    {
         parent::__construct();
 
         $this->products = new ArrayCollection();
@@ -60,53 +57,63 @@ class Category extends BaseCategory implements CategoryInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @return has products
      */
-    public function hasProducts() {
+    public function hasProducts()
+    {
         return $this->products->count() !== 0;
     }
 
     /**
-     * {@inheritdoc}
+     * @return products list
      */
-    public function getProducts() {
+    public function getProducts()
+    {
         return $this->products;
     }
 
     /**
-     * Get products count
+     * Get products count.
      *
      * @return int
      */
-    public function getProductsCount() {
+    public function getProductsCount()
+    {
         return $this->products->count();
     }
 
     /**
-     * Get created date
+     * Get created date.
      *
      * @return \DateTime
      */
-    public function getCreated() {
+    public function getCreated()
+    {
         return $this->created;
     }
 
     /**
-     * {@inheritdoc}
+     * @param type $locale
+     *
+     * @return \Aliznet\WCSBundle\Entity\Category
      */
-    public function setLocale($locale) {
+    public function setLocale($locale)
+    {
         $this->locale = $locale;
 
         return $this;
     }
 
     /**
-     * {@inheritdoc}
+     * @param type $locale
+     *
+     * @return \Aliznet\WCSBundle\Entity\translationClass
      */
-    public function getTranslation($locale = null) {
+    public function getTranslation($locale = null)
+    {
         $locale = ($locale) ? $locale : $this->locale;
         if (!$locale) {
-            return null;
+            return;
         }
         foreach ($this->getTranslations() as $translation) {
             if ($translation->getLocale() == $locale) {
@@ -124,16 +131,20 @@ class Category extends BaseCategory implements CategoryInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @return $translation
      */
-    public function getTranslations() {
+    public function getTranslations()
+    {
         return $this->translations;
     }
 
     /**
-     * {@inheritdoc}
+     * @param TranslationInterface $translation
+     *
+     * @return \Aliznet\WCSBundle\Entity\Category
      */
-    public function addTranslation(AbstractTranslation $translation) {
+    public function addTranslation(TranslationInterface $translation)
+    {
         if (!$this->translations->contains($translation)) {
             $this->translations->add($translation);
         }
@@ -142,132 +153,152 @@ class Category extends BaseCategory implements CategoryInterface {
     }
 
     /**
-     * {@inheritdoc}
+     * @param TranslationInterface $translation
+     *
+     * @return \Aliznet\WCSBundle\Entity\Category
      */
-    public function removeTranslation(AbstractTranslation $translation) {
+    public function removeTranslation(TranslationInterface $translation)
+    {
         $this->translations->removeElement($translation);
 
         return $this;
     }
 
     /**
-     * {@inheritdoc}
+     * @return string
      */
-    public function getTranslationFQCN() {
+    public function getTranslationFQCN()
+    {
         return 'Aliznet\WCSBundle\Entity\CategoryTranslation';
     }
 
     /**
-     * Get label
+     * Get label.
      *
      * @return string
      */
-    public function getLabel() {
+    public function getLabel()
+    {
         $translated = ($this->getTranslation()) ? $this->getTranslation()->getLabel() : null;
 
-        return ($translated !== '' && $translated !== null) ? $translated : '[' . $this->getCode() . ']';
+        return ($translated !== '' && $translated !== null) ? $translated : '['.$this->getCode().']';
     }
 
     /**
-     * Set label
+     * Set label.
      *
      * @param string $label
      *
      * @return CategoryInterface
      */
-    public function setLabel($label) {
+    public function setLabel($label)
+    {
         $this->getTranslation()->setLabel($label);
 
         return $this;
     }
 
     /**
-     * Returns the channels linked to the category
+     * Returns the channels linked to the category.
      *
      * @return ArrayCollection
      */
-    public function getChannels() {
+    public function getChannels()
+    {
         return $this->channels;
     }
 
     /**
      * @return string
      */
-    public function __toString() {
+    public function __toString()
+    {
         return $this->getLabel();
     }
 
     /**
-     * {@inheritdoc}
+     * @return string
      */
-    public function getReference() {
+    public function getReference()
+    {
         return $this->code;
     }
 
     /**
-     * Returns Integer
+     * Returns Integer.
      */
-    public function getDisplay() {
+    public function getDisplay()
+    {
         return $this->display;
     }
 
-     /**
-     * Returns the Thumbnail location related to category
+    /**
+     * Returns the Thumbnail location related to category.
      *
-     * @return String
+     * @return string
      */
-    public function getThumbnail() {
+    public function getThumbnail()
+    {
         return $this->thumbnail;
     }
 
     /**
-     * Set label
+     * Set label.
      *
      * @param string $label
      *
      * @return CategoryInterface
      */
-    public function setDisplay($display) {
+    public function setDisplay($display)
+    {
         $this->display = $display;
+
         return $this;
     }
 
     /**
-     * Set Thumbnail
+     * Set Thumbnail.
      *
      * @param string $thumbnail
      *
      * @return CategoryInterface
      */
-    public function setThumbnail($thumbnail) {
+    public function setThumbnail($thumbnail)
+    {
         $this->thumbnail = $thumbnail;
+
         return $this;
     }
 
     /**
-     * Returns the FullImage location related to category
+     * Returns the FullImage location related to category.
      *
-     * @return String
+     * @return string
      */
-    public function getFullImage() {
+    public function getFullImage()
+    {
         return $this->fullImage;
     }
 
     /**
-     * Set Full Image
+     * Set Full Image.
      *
      * @param string $fullImage
      *
      * @return CategoryInterface
      */
-    public function setFullImage($fullImage) {
+    public function setFullImage($fullImage)
+    {
         $this->fullImage = $fullImage;
     }
 
-    public function getParentCode() {
+    /**
+     * @return string
+     */
+    public function getParentCode()
+    {
         if (null !== parent::getParent()) {
             return parent::getParent()->getCode();
         }
     }
-
 }

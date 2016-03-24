@@ -6,11 +6,13 @@ use Doctrine\ORM\EntityRepository;
 use Pim\Bundle\BaseConnectorBundle\Reader\Doctrine\Reader;
 
 /**
+ * Category Reader.
+ *
  * @author    aliznet
  * @copyright 2016 ALIZNET (www.aliznet.fr)
  */
-class CategoryReader extends Reader {
-
+class CategoryReader extends Reader
+{
     /**
      * @var EntityRepository
      */
@@ -29,56 +31,62 @@ class CategoryReader extends Reader {
     /**
      * @param EntityRepository $categoryRepository
      */
-    public function __construct(EntityRepository $categoryRepository) {
+    public function __construct(EntityRepository $categoryRepository)
+    {
         $this->categoryRepository = $categoryRepository;
     }
 
     /**
-     * get excludedCategories
+     * get excludedCategories.
      *
      * @return string excludedCategories
      */
-    public function getExcludedCategories() {
+    public function getExcludedCategories()
+    {
         return $this->excludedCategories;
     }
 
     /**
-     * Set excludedCategories
+     * Set excludedCategories.
      *
      * @param string $excludedCategories excludedCategories
      *
      * @return AbstractProcessor
      */
-    public function setExcludedCategories($excludedCategories) {
+    public function setExcludedCategories($excludedCategories)
+    {
         $this->excludedCategories = $excludedCategories;
 
         return $this;
     }
 
     /**
-     * get language
+     * get language.
      *
      * @return string language
      */
-    public function getLanguage() {
+    public function getLanguage()
+    {
         return $this->language;
     }
 
     /**
-     * Set language
+     * Set language.
      *
      * @param string $language excludedCategories
      *
      * @return AbstractProcessor
      */
-    public function setLanguage($language) {
+    public function setLanguage($language)
+    {
         $this->language = $language;
     }
 
     /**
-     * {@inheritdoc}
+     * @return query
      */
-    public function getQuery() {
+    public function getQuery()
+    {
         if (!$this->query) {
             $qb = $this->categoryRepository->createQueryBuilder('c');
             if ($this->getExcludedCategories() != '') {
@@ -88,35 +96,35 @@ class CategoryReader extends Reader {
                     if ($i == 0) {
                         $qb->where(
                                 $qb->expr()->orX(
-                                        $qb->expr()->neq('c.code', ':code' . $i)
+                                        $qb->expr()->neq('c.code', ':code'.$i)
                                 )
                         );
-                        $qb->setParameter('code' . $i, $cat);
+                        $qb->setParameter('code'.$i, $cat);
                     } else {
                         $qb->andWhere(
                                 $qb->expr()->orX(
-                                        $qb->expr()->neq('c.code', ':code' . $i)
+                                        $qb->expr()->neq('c.code', ':code'.$i)
                                 )
                         );
-                        $qb->setParameter('code' . $i, $cat);
+                        $qb->setParameter('code'.$i, $cat);
                     }
-                    $i++;
+                    ++$i;
                     $children = $this->getCategoryChildren($cat);
-                    if ($children != NULL) {
+                    if ($children != null) {
                         foreach ($children as $child) {
                             $qb->andWhere(
                                     $qb->expr()->orX(
-                                            $qb->expr()->neq('c.code', ':code' . $i)
+                                            $qb->expr()->neq('c.code', ':code'.$i)
                                     )
                             );
-                            $qb->setParameter('code' . $i, $child["code"]);
-                            $i++;
+                            $qb->setParameter('code'.$i, $child['code']);
+                            ++$i;
                         }
                     }
                 }
             }
             $qb
-                    ->innerJoin('c.translations', 'at', 'WITH', 'at.locale=' . '\'' . $this->getLanguage() . '\'')
+                    ->innerJoin('c.translations', 'at', 'WITH', 'at.locale='.'\''.$this->getLanguage().'\'')
                     ->orderBy('c.root')
                     ->addOrderBy('c.left');
 
@@ -127,12 +135,15 @@ class CategoryReader extends Reader {
     }
 
     /**
-     * Get all children of a category by its code
+     * @param string $categoryCode
+     *
+     * @return query
      */
-    protected function getCategoryChildren($categoryCode) {
+    protected function getCategoryChildren($categoryCode)
+    {
         $categoryId = $this->getCategoryId($categoryCode);
-        if ($categoryId == NULL) {
-            return null;
+        if ($categoryId == null) {
+            return;
         }
         $qb = $this->categoryRepository->createQueryBuilder('c');
         $qb->select('c.code')
@@ -148,13 +159,19 @@ class CategoryReader extends Reader {
                         )
                 )
                 ->setParameter('root', $categoryId['id']);
+
         return $qb->getQuery()->getResult();
     }
 
     /**
-     * Get category ID by its code
+     * Get category ID by its code.
+     *
+     * @param string $categoryCode
+     *
+     * @return category
      */
-    protected function getCategoryId($categoryCode) {
+    protected function getCategoryId($categoryCode)
+    {
         $qb = $this->categoryRepository->createQueryBuilder('c');
         $qb->select('c.id')
                 ->where(
@@ -163,29 +180,30 @@ class CategoryReader extends Reader {
                         )
                 )
                 ->setParameter('code', $categoryCode);
+
         return $qb->getQuery()->getOneOrNullResult();
     }
 
     /**
-     * {@inheritdoc}
+     * @return array
      */
-    public function getConfigurationFields() {
+    public function getConfigurationFields()
+    {
         return array(
             'excludedCategories' => array(
                 'options' => array(
                     'required' => false,
-                    'label' => 'aliznet_wcs_export.export.excludedCategories.label',
-                    'help' => 'aliznet_wcs_export.export.excludedCategories.help'
-                )
+                    'label'    => 'aliznet_wcs_export.export.excludedCategories.label',
+                    'help'     => 'aliznet_wcs_export.export.excludedCategories.help',
+                ),
             ),
             'language' => array(
                 'options' => array(
                     'required' => true,
-                    'label' => 'aliznet_wcs_export.export.language.label',
-                    'help' => 'aliznet_wcs_export.export.language.help'
-                )
-            )
+                    'label'    => 'aliznet_wcs_export.export.language.label',
+                    'help'     => 'aliznet_wcs_export.export.language.help',
+                ),
+            ),
         );
     }
-
 }

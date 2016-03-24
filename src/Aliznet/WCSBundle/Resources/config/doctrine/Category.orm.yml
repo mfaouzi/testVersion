@@ -64,10 +64,10 @@ Aliznet\WCSBundle\Entity\Category:
                 - persist
                 - detach
         channels:
-            targetEntity: Pim\Bundle\CatalogBundle\Model\ChannelInterface
+            targetEntity: Pim\Component\Catalog\Model\ChannelInterface
             mappedBy: category
         children:
-            targetEntity: Pim\Bundle\CatalogBundle\Model\CategoryInterface
+            targetEntity: Pim\Component\Catalog\Model\CategoryInterface
             mappedBy: parent
             cascade:
                 - persist
@@ -75,16 +75,11 @@ Aliznet\WCSBundle\Entity\Category:
                 left: ASC
     manyToOne:
         parent:
-            targetEntity: Pim\Bundle\CatalogBundle\Model\CategoryInterface
+            targetEntity: Pim\Component\Catalog\Model\CategoryInterface
             inversedBy: children
             joinColumns:
                 parent_id:
                     referencedColumnName: id
                     onDelete: 'SET NULL'
             gedmo:
-                - treeParent            
-        
-
-                
-                
-        
+                - treeParent

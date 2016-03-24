@@ -2,28 +2,26 @@
 
 namespace Aliznet\WCSBundle\Reader\Doctrine;
 
-use Pim\Bundle\CatalogBundle\Version;
-use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
-use Akeneo\Bundle\BatchBundle\Item\AbstractConfigurableStepElement;
+use Akeneo\Component\Batch\Item\AbstractConfigurableStepElement;
+use Akeneo\Component\Batch\Model\StepExecution;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Pim\Bundle\BaseConnectorBundle\Reader\ProductReaderInterface;
-use Symfony\Component\Validator\Constraints as Assert;
-use Pim\Bundle\TransformBundle\Converter\MetricConverter;
 use Pim\Bundle\BaseConnectorBundle\Validator\Constraints\Channel as ChannelConstraint;
 use Pim\Bundle\CatalogBundle\Manager\ChannelManager;
 use Pim\Bundle\CatalogBundle\Manager\CompletenessManager;
 use Pim\Bundle\CatalogBundle\Repository\ProductRepositoryInterface;
+use Pim\Bundle\TransformBundle\Converter\MetricConverter;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @author    aliznet
  * @copyright 2016 ALIZNET (www.aliznet.fr)
  */
-
 class ProductReader extends AbstractConfigurableStepElement implements ProductReaderInterface
 {
     /**
-     * @var integer
+     * @var int
      */
     protected $limit = 10;
 
@@ -46,12 +44,12 @@ class ProductReader extends AbstractConfigurableStepElement implements ProductRe
     protected $query;
 
     /**
-     * @var integer
+     * @var int
      */
     protected $offset = 0;
 
     /**
-     * @var null|integer[]
+     * @var null|int[]
      */
     protected $ids = null;
 
@@ -86,24 +84,24 @@ class ProductReader extends AbstractConfigurableStepElement implements ProductRe
     protected $stepExecution;
 
     /**
-     * @var boolean
+     * @var bool
      */
     protected $missingCompleteness;
-    
+
     /**
-     * @var boolean
+     * @var bool
      */
     protected $isComplete = true;
 
     /**
      * @var date
      */
-    protected $exportFrom = "1970-01-01 01:00:00";
-    
+    protected $exportFrom = '1970-01-01 01:00:00';
+
     /**
-     * get isComplete
+     * get isComplete.
      *
-     * @return boolean isComplete
+     * @return bool isComplete
      */
     public function getIsComplete()
     {
@@ -111,7 +109,7 @@ class ProductReader extends AbstractConfigurableStepElement implements ProductRe
     }
 
     /**
-     * Set isComplete
+     * Set isComplete.
      *
      * @param string isComplete $isComplete
      *
@@ -123,9 +121,9 @@ class ProductReader extends AbstractConfigurableStepElement implements ProductRe
 
         return $this;
     }
-    
+
     /**
-     * get exportFrom
+     * get exportFrom.
      *
      * @return string exportFrom
      */
@@ -135,7 +133,7 @@ class ProductReader extends AbstractConfigurableStepElement implements ProductRe
     }
 
     /**
-     * Set exportFrom
+     * Set exportFrom.
      *
      * @param string $exportFrom exportFrom
      *
@@ -157,8 +155,8 @@ class ProductReader extends AbstractConfigurableStepElement implements ProductRe
      * @param CompletenessManager        $completenessManager
      * @param MetricConverter            $metricConverter
      * @param EntityManager              $entityManager
-     * @param boolean                    $missingCompleteness
-     * @param boolean                    $missingCompleteness
+     * @param bool                       $missingCompleteness
+     * @param bool                       $missingCompleteness
      */
     public function __construct(
         ProductRepositoryInterface $repository,
@@ -168,17 +166,17 @@ class ProductReader extends AbstractConfigurableStepElement implements ProductRe
         EntityManager $entityManager,
         $missingCompleteness = true
     ) {
-        $this->entityManager       = $entityManager;
-        $this->repository          = $repository;
-        $this->channelManager      = $channelManager;
+        $this->entityManager = $entityManager;
+        $this->repository = $repository;
+        $this->channelManager = $channelManager;
         $this->completenessManager = $completenessManager;
-        $this->metricConverter     = $metricConverter;
-        $this->products            = new \ArrayIterator();
+        $this->metricConverter = $metricConverter;
+        $this->products = new \ArrayIterator();
         $this->missingCompleteness = $missingCompleteness;
     }
 
     /**
-     * Set query used by the reader
+     * Set query used by the reader.
      *
      * @param AbstractQuery $query
      *
@@ -190,7 +188,7 @@ class ProductReader extends AbstractConfigurableStepElement implements ProductRe
     }
 
     /**
-     * Get query to execute
+     * Get query to execute.
      *
      * @return AbstractQuery
      */
@@ -236,16 +234,16 @@ class ProductReader extends AbstractConfigurableStepElement implements ProductRe
                     'required' => true,
                     'select2'  => true,
                     'label'    => 'pim_base_connector.export.channel.label',
-                    'help'     => 'pim_base_connector.export.channel.help'
-               )
+                    'help'     => 'pim_base_connector.export.channel.help',
+               ),
             ),
             'isComplete' => array(
-                'type'    => 'switch',
+                'type'     => 'switch',
                 'required' => false,
-                'options' => array(
-                    'help'    => 'aliznet_wcs_export.export.isComplete.help',
-                    'label'   => 'aliznet_wcs_export.export.isComplete.label',
-                )
+                'options'  => array(
+                    'help'  => 'aliznet_wcs_export.export.isComplete.help',
+                    'label' => 'aliznet_wcs_export.export.isComplete.label',
+                ),
             ),
        );
     }
@@ -287,7 +285,7 @@ class ProductReader extends AbstractConfigurableStepElement implements ProductRe
     }
 
     /**
-     * @param integer $limit
+     * @param int $limit
      *
      * @return ORMProductReader
      */
@@ -299,7 +297,7 @@ class ProductReader extends AbstractConfigurableStepElement implements ProductRe
     }
 
     /**
-     * Get ids of products which are completes and in channel
+     * Get ids of products which are completes and in channel.
      *
      * @return array
      */
@@ -333,7 +331,7 @@ class ProductReader extends AbstractConfigurableStepElement implements ProductRe
     }
 
     /**
-     * Get next products batch from DB
+     * Get next products batch from DB.
      *
      * @return \ArrayIterator
      */
