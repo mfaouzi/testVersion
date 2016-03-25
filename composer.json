@@ -22,6 +22,7 @@
         "symfony/framework-bundle": ">=2.1", 
         "twig/twig": "*",
         "doctrine/doctrine-bundle": "*"
+        "Aliznet/WCSBundle" : "dev-master"
     },
     "autoload": {
     "psr-4": {
