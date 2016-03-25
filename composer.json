@@ -27,7 +27,6 @@
     "psr-4": {
       "": "src"
     },
-    "target-dir": "Aliznet/WCSBundle",
-    "minimum-stability": "dev"
+    "target-dir": "Aliznet/WCSBundle"
     }
 }
