@@ -29,4 +29,5 @@
     },
     "target-dir": "Aliznet/WCSBundle",
     "minimum-stability": "dev"
+    }
 }
