@@ -41,6 +41,16 @@ aliznet_wcs_export:
         isComplete:
             label: Products completness
             help: Yes for complete product / No for uncomplete product
+        exportFrom:
+            label: Last product modification date
+            help: date format YYYY-MM-DD h:m:s 
+        exportPriceOnly:
+            label: Data to export
+            help: Choose data to export  
+            choices:
+                all: Export all
+                withoutPrices: All except prices
+                onlyPrices: Prices only
         excludedCategories:
             label: Excluded root categories
             help: Root categories codes to exclude (separated by comas, it will also exclude its children)

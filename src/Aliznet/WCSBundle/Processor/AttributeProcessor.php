@@ -92,7 +92,7 @@ implements ItemProcessorInterface
     public function processattributeType($attributetype)
     {
         $pim_attribute_type_integer = array('pim_catalog_boolean', 'pim_catalog_number');
-        $pim_attribute_type_float = array('pim_catalog_mertic');
+        $pim_attribute_type_float = array('pim_catalog_metric');
         $pim_attribute_type_double = array('pim_catalog_price_collection');
         $pim_attribute_type_string = array('pim_catalog_date', 'pim_catalog_file', 'pim_catalog_identifier', 'pim_catalog_image', 'pim_catalog_multiselect',
                                           'pim_catalog_simpleselect', 'pim_catalog_text', 'pim_catalog_textarea', );

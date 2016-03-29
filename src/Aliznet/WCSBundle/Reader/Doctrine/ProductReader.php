@@ -2,8 +2,8 @@
 
 namespace Aliznet\WCSBundle\Reader\Doctrine;
 
-use Akeneo\Component\Batch\Item\AbstractConfigurableStepElement;
 use Akeneo\Component\Batch\Model\StepExecution;
+use Akeneo\Component\Batch\Item\AbstractConfigurableStepElement;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Pim\Bundle\BaseConnectorBundle\Reader\ProductReaderInterface;
@@ -15,6 +15,8 @@ use Pim\Bundle\TransformBundle\Converter\MetricConverter;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
+ * Product Reader.
+ *
  * @author    aliznet
  * @copyright 2016 ALIZNET (www.aliznet.fr)
  */
@@ -89,38 +91,24 @@ class ProductReader extends AbstractConfigurableStepElement implements ProductRe
     protected $missingCompleteness;
 
     /**
-     * @var bool
-     */
-    protected $isComplete = true;
-
-    /**
      * @var date
      */
     protected $exportFrom = '1970-01-01 01:00:00';
 
     /**
-     * get isComplete.
-     *
-     * @return bool isComplete
+     * @var string
      */
-    public function getIsComplete()
-    {
-        return $this->isComplete;
-    }
+    protected $batchExportID = 1;
 
     /**
-     * Set isComplete.
-     *
-     * @param string isComplete $isComplete
-     *
-     * @return AbstractProcessor
+     * @var bool
      */
-    public function setIsComplete($isComplete)
-    {
-        $this->isComplete = $isComplete;
+    protected $isEnabled = true;
 
-        return $this;
-    }
+    /**
+     * @var bool
+     */
+    protected $isComplete = true;
 
     /**
      * get exportFrom.
@@ -147,8 +135,77 @@ class ProductReader extends AbstractConfigurableStepElement implements ProductRe
     }
 
     /**
-     * 
+     * get batchExportID.
+     *
+     * @return string batchExportID
      */
+    public function getBatchExportID()
+    {
+        return $this->batchExportID;
+    }
+
+    /**
+     * Set $batchExportID.
+     *
+     * @param string batchExportID $batchExportID
+     *
+     * @return AbstractProcessor
+     */
+    public function setBatchExportID($batchExportID)
+    {
+        $this->batchExportID = $batchExportID;
+
+        return $this;
+    }
+
+    /**
+     * get isEnabled.
+     *
+     * @return bool isEnabled
+     */
+    public function getIsEnabled()
+    {
+        return $this->isEnabled;
+    }
+
+    /**
+     * Set isEnabled.
+     *
+     * @param string isEnabled $isEnabled
+     *
+     * @return AbstractProcessor
+     */
+    public function setIsEnabled($isEnabled)
+    {
+        $this->isEnabled = $isEnabled;
+
+        return $this;
+    }
+
+    /**
+     * get isComplete.
+     *
+     * @return bool isComplete
+     */
+    public function getIsComplete()
+    {
+        return $this->isComplete;
+    }
+
+    /**
+     * Set isComplete.
+     *
+     * @param string isComplete $isComplete
+     *
+     * @return AbstractProcessor
+     */
+    public function setIsComplete($isComplete)
+    {
+        $this->isComplete = $isComplete;
+
+        return $this;
+    }
+
     /**
      * @param ProductRepositoryInterface $repository
      * @param ChannelManager             $channelManager
@@ -156,15 +213,9 @@ class ProductReader extends AbstractConfigurableStepElement implements ProductRe
      * @param MetricConverter            $metricConverter
      * @param EntityManager              $entityManager
      * @param bool                       $missingCompleteness
-     * @param bool                       $missingCompleteness
      */
     public function __construct(
-        ProductRepositoryInterface $repository,
-        ChannelManager $channelManager,
-        CompletenessManager $completenessManager,
-        MetricConverter $metricConverter,
-        EntityManager $entityManager,
-        $missingCompleteness = true
+    ProductRepositoryInterface $repository, ChannelManager $channelManager, CompletenessManager $completenessManager, MetricConverter $metricConverter, EntityManager $entityManager, $missingCompleteness = true
     ) {
         $this->entityManager = $entityManager;
         $this->repository = $repository;
@@ -184,6 +235,13 @@ class ProductReader extends AbstractConfigurableStepElement implements ProductRe
      */
     public function setQuery(AbstractQuery $query)
     {
+        if (!is_a($query, 'Doctrine\ORM\AbstractQuery', true)) {
+            throw new \InvalidArgumentException(
+            sprintf(
+                    '$query must be a Doctrine\ORM\AbstractQuery instance, got "%s"', is_object($query) ? get_class($query) : $query
+            )
+            );
+        }
         $this->query = $query;
     }
 
@@ -198,7 +256,7 @@ class ProductReader extends AbstractConfigurableStepElement implements ProductRe
     }
 
     /**
-     * {@inheritdoc}
+     * @return entity product
      */
     public function read()
     {
@@ -222,7 +280,7 @@ class ProductReader extends AbstractConfigurableStepElement implements ProductRe
     }
 
     /**
-     * {@inheritdoc}
+     * @return array
      */
     public function getConfigurationFields()
     {
@@ -235,7 +293,22 @@ class ProductReader extends AbstractConfigurableStepElement implements ProductRe
                     'select2'  => true,
                     'label'    => 'pim_base_connector.export.channel.label',
                     'help'     => 'pim_base_connector.export.channel.help',
-               ),
+                ),
+            ),
+            'exportFrom' => array(
+                'required' => false,
+                'options'  => array(
+                    'help'  => 'aliznet_wcs_export.export.exportFrom.help',
+                    'label' => 'aliznet_wcs_export.export.exportFrom.label',
+                ),
+            ),
+            'isEnabled' => array(
+                'type'     => 'switch',
+                'required' => false,
+                'options'  => array(
+                    'help'  => 'aliznet_wcs_export.export.isEnabled.help',
+                    'label' => 'aliznet_wcs_export.export.isEnabled.label',
+                ),
             ),
             'isComplete' => array(
                 'type'     => 'switch',
@@ -245,11 +318,13 @@ class ProductReader extends AbstractConfigurableStepElement implements ProductRe
                     'label' => 'aliznet_wcs_export.export.isComplete.label',
                 ),
             ),
-       );
+        );
     }
 
     /**
-     * {@inheritdoc}
+     * initialize.
+     *
+     * @param empty
      */
     public function initialize()
     {
@@ -261,7 +336,7 @@ class ProductReader extends AbstractConfigurableStepElement implements ProductRe
     }
 
     /**
-     * {@inheritdoc}
+     * @param channel $channel
      */
     public function setChannel($channel)
     {
@@ -269,7 +344,7 @@ class ProductReader extends AbstractConfigurableStepElement implements ProductRe
     }
 
     /**
-     * {@inheritdoc}
+     * @return channel
      */
     public function getChannel()
     {
@@ -277,7 +352,7 @@ class ProductReader extends AbstractConfigurableStepElement implements ProductRe
     }
 
     /**
-     * {@inheritdoc}
+     * @param StepExecution $stepExecution
      */
     public function setStepExecution(StepExecution $stepExecution)
     {
@@ -311,8 +386,7 @@ class ProductReader extends AbstractConfigurableStepElement implements ProductRe
             $this->completenessManager->generateMissingForChannel($this->channel);
         }
 
-        $this->query = $this->repository
-            ->buildByChannelAndCompleteness($this->channel);
+        $this->query = $this->ALIZNETBuildByChannelAndCompleteness($this->channel, $this->getIsComplete());
 
         $rootAlias = current($this->query->getRootAliases());
         $rootIdExpr = sprintf('%s.id', $rootAlias);
@@ -320,14 +394,80 @@ class ProductReader extends AbstractConfigurableStepElement implements ProductRe
         $from = current($this->query->getDQLPart('from'));
 
         $this->query
-            ->select($rootIdExpr)
-            ->resetDQLPart('from')
-            ->from($from->getFrom(), $from->getAlias(), $rootIdExpr)
-            ->groupBy($rootIdExpr);
+                ->select($rootIdExpr)
+                ->resetDQLPart('from')
+                ->from($from->getFrom(), $from->getAlias(), $rootIdExpr)
+                ->andWhere(
+                        $this->query->expr()->orX(
+                                $this->query->expr()->gte($from->getAlias().'.updated', ':updated')
+                        )
+                )
+                ->setParameter('updated', $this->getDateFilter())
+                ->setParameter('enabled', $this->getIsEnabled())
+                ->groupBy($rootIdExpr);
 
         $results = $this->query->getQuery()->getArrayResult();
 
         return array_keys($results);
+    }
+
+    /**
+     * Get product collection by channel and completness.
+     *
+     * @param type $channel
+     * @param type $isComplete
+     *
+     * @return type
+     */
+    protected function ALIZNETBuildByChannelAndCompleteness($channel, $isComplete)
+    {
+        $scope = $channel->getCode();
+
+        $qb = $this->repository->buildByScope($scope);
+
+        $rootAlias = $qb->getRootAlias();
+
+        if ($isComplete == 1) {
+            $complete = $qb->expr()->eq('pCompleteness.ratio', '100');
+        } else {
+            $complete = $qb->expr()->lte('pCompleteness.ratio', '100');
+        }
+
+        $expression = 'pCompleteness.product = '.$rootAlias.' AND '.
+                $complete.' AND '.
+                $qb->expr()->eq('pCompleteness.channel', $channel->getId());
+
+        $rootEntity = current($qb->getRootEntities());
+        $completenessMapping = $this->entityManager->getClassMetadata($rootEntity)
+                ->getAssociationMapping('completenesses');
+        $completenessClass = $completenessMapping['targetEntity'];
+        $qb->innerJoin(
+                $completenessClass, 'pCompleteness', 'WITH', $expression
+        );
+
+        $treeId = $channel->getCategory()->getId();
+        $expression = $qb->expr()->eq('pCategory.root', $treeId);
+        $qb->innerJoin(
+                $rootAlias.'.categories', 'pCategory', 'WITH', $expression
+        );
+
+        return $qb;
+    }
+
+    /**
+     * Get the date use to filter the product collection.
+     *
+     * @return string
+     */
+    protected function getDateFilter()
+    {
+        $q = $this->entityManager->createQuery("select MAX(je.endTime) from Akeneo\Component\Batch\Model\JobExecution je where je.jobInstance = ".$this->getBatchExportID());
+
+        $lastJobDate = $q->getOneOrNullResult();
+
+        $date = (isset($lastJobDate[1]) && $lastJobDate[1] != null) ? $lastJobDate[1] : '1970-01-01 01:00:00';
+
+        return ($this->getExportFrom() != '') ? $this->getExportFrom() : $date;
     }
 
     /**

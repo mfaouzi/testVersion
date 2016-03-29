@@ -2,140 +2,221 @@
 
 namespace Aliznet\WCSBundle\Writer\File;
 
-use Akeneo\Bundle\BatchBundle\Job\RuntimeErrorException;
+use Pim\Bundle\BaseConnectorBundle\Validator\Constraints\Channel;
+use Pim\Bundle\CatalogBundle\Manager\ChannelManager;
+use Pim\Bundle\CatalogBundle\Manager\MediaManager;
+use Pim\Bundle\CatalogBundle\Model\AbstractProductMedia;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * CSV Writer.
+ * CSV Product Writer.
  *
  * @author    aliznet
  * @copyright 2016 ALIZNET (www.aliznet.fr)
  */
-class CsvWriter extends FileWriter
+class CsvProductWriter extends CsvWriter
 {
     /**
-     * @Assert\NotBlank
-     * @Assert\Choice(choices={",", ";", "|"}, message="The value must be one of , or ; or |")
-     *
      * @var string
      */
-    protected $delimiter = ';';
+    protected $exportPriceOnly;
 
     /**
-     * @Assert\NotBlank
-     * @Assert\Choice(choices={"""", "'"}, message="The value must be one of "" or '")
+     * Assert\NotBlank(groups={"Execution"})
+     * Channel.
      *
-     * @var string
+     * @var string Channel code
      */
-    protected $enclosure = '"';
+    protected $channel;
 
     /**
-     * @var bool
+     * @var ChannelManager
      */
-    protected $withHeader = true;
+    protected $channelManager;
 
     /**
      * @var array
      */
-    protected $writtenFiles = array();
+    protected $fixedDatas = array('family', 'groups', 'categories', 'RELATED-groups', 'RELATED-products');
 
     /**
-     * @var array
+     * @param MediaManager $mediaManager
      */
-    protected $items = [];
-
-    /**
-     * Set the csv delimiter character.
-     *
-     * @param string $delimiter
-     */
-    public function setDelimiter($delimiter)
+    public function __construct($entityManager, ChannelManager $channelManager)
     {
-        $this->delimiter = $delimiter;
+        $this->entityManager = $entityManager;
+        $this->channelManager = $channelManager;
     }
 
     /**
-     * Get the csv delimiter character.
+     * Set the configured channel.
      *
-     * @return string
+     * @param string $channel
      */
-    public function getDelimiter()
+    public function setChannel($channel)
     {
-        return $this->delimiter;
+        $this->channel = $channel;
     }
 
     /**
-     * Set the csv enclosure character.
-     *
-     * @param string $enclosure
-     */
-    public function setEnclosure($enclosure)
-    {
-        $this->enclosure = $enclosure;
-    }
-
-    /**
-     * Get the csv enclosure character.
+     * Get the configured channel.
      *
      * @return string
      */
-    public function getEnclosure()
+    public function getChannel()
     {
-        return $this->enclosure;
+        return $this->channel;
     }
 
     /**
-     * Set whether or not to print a header row into the csv.
+     * get exportPriceOnly.
      *
-     * @param bool $withHeader
+     * @return string exportPriceOnly
      */
-    public function setWithHeader($withHeader)
+    public function getExportPriceOnly()
     {
-        $this->withHeader = $withHeader;
+        return $this->exportPriceOnly;
     }
 
     /**
-     * Get whether or not to print a header row into the csv.
+     * Set exportPriceOnly.
      *
-     * @return bool
-     */
-    public function isWithHeader()
-    {
-        return $this->withHeader;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getWrittenFiles()
-    {
-        return $this->writtenFiles;
-    }
-
-    /**
-     * Flush items into a csv file.
+     * @param string $exportPriceOnly exportPriceOnly
      *
-     * @throws RuntimeErrorException
+     * @return AbstractProcessor
      */
-    public function flush()
+    public function setExportPriceOnly($exportPriceOnly)
     {
-        $this->writtenFiles[$this->getPath()] = basename($this->getPath());
-        $uniqueKeys = $this->getAllKeys($this->items);
-        $fullItems = $this->mergeKeys($uniqueKeys);
-        if (false === $csvFile = fopen($this->getPath(), 'w')) {
-            throw new RuntimeErrorException('Failed to open file %path%', ['%path%' => $this->getPath()]);
+        $this->exportPriceOnly = $exportPriceOnly;
+
+        return $this;
+    }
+
+    /**
+     * @param array $items
+     */
+    public function write(array $items)
+    {
+        $products = [];
+
+        if (!is_dir(dirname($this->getPath()))) {
+            mkdir(dirname($this->getPath()), 0777, true);
         }
-        $header = $this->isWithHeader() ? $uniqueKeys : [];
-        if (false === fputcsv($csvFile, $header, $this->delimiter)) {
-            throw new RuntimeErrorException('Failed to write to file %path%', ['%path%' => $this->getPath()]);
+
+        foreach ($items as $item) {
+            $item['product'] = $this->getProductPricesOnly($item['product']);
+            $item['product'] = $this->formatMetricsColumns($item['product']);
+            //$products[] = ($this->getExportImages()) ? $item['product'] : $this->removeMediaColumns($item['product']);
+            $products[] = $item['product'];
         }
-        foreach ($fullItems as $item) {
-            if (false === fputcsv($csvFile, $item, $this->delimiter, $this->enclosure)) {
-                throw new RuntimeErrorException('Failed to write to file %path%', ['%path%' => $this->getPath()]);
-            } elseif ($this->stepExecution) {
-                $this->stepExecution->incrementSummaryInfo('write');
+
+        $this->items = array_merge($this->items, $products);
+    }
+
+    /**
+     * @param array|AbstractProductMedia $media
+     */
+    public function sendMedia($media)
+    {
+        $filePath = null;
+        $exportPath = null;
+
+        if (is_array($media)) {
+            $filePath = $media['filePath'];
+            $exportPath = $media['exportPath'];
+        } else {
+            if ('' !== $media->getFileName()) {
+                $filePath = $media->getFilePath();
+            }
+            $exportPath = $this->mediaManager->getExportPath($media);
+        }
+
+        if (null === $filePath) {
+            return;
+        }
+
+        $dirname = dirname($exportPath);
+    }
+
+    /**
+     * @param $item array
+     * Get only prices or all data without prices
+     *
+     * @return array
+     */
+    protected function getProductPricesOnly($item)
+    {
+        if ($this->getExportPriceOnly() == 'all') {
+            return $item;
+        }
+        $attributeEntity = $this->entityManager->getRepository('Pim\Bundle\CatalogBundle\Entity\Attribute');
+        $attributes = $attributeEntity->getNonIdentifierAttributes();
+        foreach ($attributes as $attribute) {
+            if ($this->getExportPriceOnly() == 'onlyPrices') {
+                if ($attribute->getBackendType() != 'prices') {
+                    $attributesToRemove = preg_grep('/^'.$attribute->getCode().'D*/', array_keys($item));
+                    foreach ($attributesToRemove as $attributeToRemove) {
+                        unset($item[$attributeToRemove]);
+                    }
+                }
+            } elseif ($this->getExportPriceOnly() == 'withoutPrices') {
+                if ($attribute->getBackendType() == 'prices') {
+                    $attributesToRemove = preg_grep('/^'.$attribute->getCode().'D*/', array_keys($item));
+                    foreach ($attributesToRemove as $attributeToRemove) {
+                        unset($item[$attributeToRemove]);
+                    }
+                }
             }
         }
+
+        if ($this->getExportPriceOnly() == 'onlyPrices') {
+            foreach ($this->fixedDatas as $fixedData) {
+                unset($item[$fixedData]);
+            }
+        }
+
+        return $item;
+    }
+
+    /**
+     * @param array $item
+     *                    Add channel code to metric attributes header columns
+     *
+     * @return array
+     */
+    protected function formatMetricsColumns($item)
+    {
+        $attributeEntity = $this->entityManager->getRepository('Pim\Bundle\CatalogBundle\Entity\Attribute');
+        $attributes = $attributeEntity->getNonIdentifierAttributes();
+        foreach ($attributes as $attribute) {
+            if ($attribute->getBackendType() == 'metric') {
+                if (array_key_exists($attribute->getCode(), $item)) {
+                    $item[$attribute->getCode().'-'.$this->getChannel()] = $item[$attribute->getCode()];
+                    unset($item[$attribute->getCode()]);
+                }
+            }
+        }
+
+        return $item;
+    }
+
+    /**
+     * @param array $item
+     *                    Remove all column of attributes with type media
+     *
+     * @return array
+     */
+    protected function removeMediaColumns($item)
+    {
+        $attributeEntity = $this->entityManager->getRepository('Pim\Bundle\CatalogBundle\Entity\Attribute');
+        $mediaAttributesCodes = $attributeEntity->findMediaAttributeCodes();
+        foreach ($mediaAttributesCodes as $mediaAttributesCode) {
+            if (array_key_exists($mediaAttributesCode, $item)) {
+                unset($item[$mediaAttributesCode]);
+            }
+        }
+
+        return $item;
     }
 
     /**
@@ -144,37 +225,27 @@ class CsvWriter extends FileWriter
     public function getConfigurationFields()
     {
         return
-                array_merge(parent::getConfigurationFields(), array(
-            'delimiter' => array(
+                array_merge(
+                array(
+            'exportPriceOnly' => array(
+                'type'    => 'choice',
                 'options' => array(
-                    'label' => 'pim_base_connector.export.delimiter.label',
-                    'help'  => 'pim_base_connector.export.delimiter.help',
+                    'choices' => array(
+                        'all'           => 'aliznet_wcs_export.export.exportPriceOnly.choices.all',
+                        'withoutPrices' => 'aliznet_wcs_export.export.exportPriceOnly.choices.withoutPrices',
+                        'onlyPrices'    => 'aliznet_wcs_export.export.exportPriceOnly.choices.onlyPrices',
+                    ),
+                    'required' => true,
+                    'select2'  => true,
+                    'label'    => 'aliznet_wcs_export.export.exportPriceOnly.label',
+                    'help'     => 'aliznet_wcs_export.export.exportPriceOnly.help',
                 ),
             ),
-            'enclosure' => array(
-                'options' => array(
-                    'label' => 'pim_base_connector.export.enclosure.label',
-                    'help'  => 'pim_base_connector.export.enclosure.help',
-                ),
-            ),
-            'withHeader' => array(
-                'type'    => 'switch',
-                'options' => array(
-                    'label' => 'pim_base_connector.export.withHeader.label',
-                    'help'  => 'pim_base_connector.export.withHeader.help',
-                ),
-            ), ));
+                ), parent::getConfigurationFields()
+        );
     }
-
-    /**
-     * @param array $items
-     */
-    public function write(array $items)
-    {
-        $this->items = array_merge($this->items, $items);
-    }
-
-    /**
+	
+	/**
      * Get a set of all keys inside arrays.
      *
      * @param array $items
@@ -184,8 +255,10 @@ class CsvWriter extends FileWriter
     protected function getAllKeys(array $items)
     {
         $intKeys = [];
-        foreach ($items as $item) {
-            $intKeys[] = array_keys($item);
+        foreach ($items as $itemss) {
+            foreach ($itemss as $item) {
+                $intKeys[] = array_keys($item);
+            }
         }
         if (0 === count($intKeys)) {
             return [];
@@ -206,8 +279,10 @@ class CsvWriter extends FileWriter
     {
         $uniqueKeys = array_fill_keys($uniqueKeys, '');
         $fullItems = [];
-        foreach ($this->items as $item) {
-            $fullItems[] = array_merge($uniqueKeys, $item);
+        foreach ($this->items as $itemss) {
+            foreach ($itemss as $item) {
+                $fullItems[] = array_merge($uniqueKeys, $item);
+            }
         }
 
         return $fullItems;

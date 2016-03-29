@@ -4,6 +4,13 @@ namespace Aliznet\WCSBundle\Processor;
 
 use Akeneo\Component\Batch\Item\AbstractConfigurableStepElement;
 use Akeneo\Component\Batch\Item\ItemProcessorInterface;
+use Pim\Bundle\BaseConnectorBundle\Validator\Constraints\Channel;
+use Pim\Component\Catalog\Builder\ProductBuilderInterface;
+use Pim\Bundle\CatalogBundle\Manager\ChannelManager;
+use Pim\Component\Catalog\Model\ProductInterface;
+use Pim\Bundle\CatalogBundle\Model\ProductValueInterface;
+use Symfony\Component\Serializer\Serializer;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Product Processor.
@@ -13,89 +20,212 @@ use Akeneo\Component\Batch\Item\ItemProcessorInterface;
  */
 class ProductProcessor extends AbstractConfigurableStepElement implements ItemProcessorInterface
 {
-    /**
-     * @var string
-     */
-    protected $wcsattributetype;
+    /** @var Serializer */
+    protected $serializer;
 
     /**
-     * @var string
-     */
-    protected $language;
-
-    /**
-     * get language.
+     * @Assert\NotBlank(groups={"Execution"})
+     * @Channel
      *
-     * @return string language
+     * @var string Channel code
      */
-    public function getLanguage()
-    {
-        return $this->language;
+    protected $channel;
+
+    /** @var ChannelManager */
+    protected $channelManager;
+
+    /** @var array Normalizer context */
+    protected $normalizerContext;
+
+    /** @var array */
+    protected $mediaAttributeTypes;
+
+    /** @var ProductBuilderInterface */
+    protected $productBuilder;
+
+    /**
+     * @param Serializer              $serializer
+     * @param ChannelManager          $channelManager
+     * @param string[]                $mediaAttributeTypes
+     * @param ProductBuilderInterface $productBuilder
+     */
+    public function __construct(
+    Serializer $serializer, ChannelManager $channelManager, array $mediaAttributeTypes, ProductBuilderInterface $productBuilder = null
+    ) {
+        $this->serializer = $serializer;
+        $this->channelManager = $channelManager;
+        $this->mediaAttributeTypes = $mediaAttributeTypes;
+        $this->productBuilder = $productBuilder;
     }
 
     /**
-     * Set exportedAttributes.
+     * @param type $product
      *
-     * @return string $language language
+     * @return type
      */
-    public function setLanguage($language)
+    public function process($product)
     {
-        $this->language = $language;
+        if (null !== $this->productBuilder) {
+            $contextChannel = $this->channelManager->getChannelByCode($this->channel);
+            $this->productBuilder->addMissingProductValues($product, [$contextChannel], $contextChannel->getLocales()->toArray());
+        }
+
+		$groups = $product->getGroupCodes();
+		$categories = $product->getCategoryCodes();
+		
+		$prices = $product->getValue('price')->getPrices();
+		
+		$i = 0;
+		$data['product'] = [];
+		$data['media'] = [];
+		if(!empty($prices))
+		{
+			$currencies = [];
+			foreach ($prices as $price) {
+				$currencies[] = $price->getCurrency();
+			}
+			foreach ($currencies as $currency)
+			{
+				$mediaValues = $this->getMediaProductValues($product);
+
+				foreach ($mediaValues as $mediaValue) {
+					$data['media'][$i][] = $this->serializer->normalize(
+						$mediaValue->getMedia(), 'flat', ['field_name' => 'media', 'prepare_copy' => true, 'value' => $mediaValue]
+					);
+				}
+				
+				$data['product'][$i]['PartNumber'] = $product->getValue('sku')->getProduct()->getLabel();
+				$data['product'][$i]['Type'] = 'ITEM';
+				$data['product'][$i]['ParentPartNumber'] = (empty($groups)) ? '' : $groups[0];
+				$data['product'][$i]['Sequence'] = '1';
+				$data['product'][$i]['ParentGroupIdentifier'] = (empty($categories)) ? '' : $categories[0];
+				$data['product'][$i]['Currency'] = $currency;
+
+				$filename = 'products_atrributes.txt';
+				$dir = dirname(dirname(dirname(dirname(dirname(__FILE__)))));
+				$file = $dir.'/web/WCS/'.$filename;
+
+				$filename = 'products_atrributes.txt';
+				$dir = dirname(dirname(dirname(dirname(dirname(__FILE__)))));
+				$file = $dir . '/web/WCS/' . $filename;
+
+				$attributes = [];
+				if (file_exists($file) && file($file)) {
+					$lines = file($file);
+					foreach ($lines as $line) {
+						$att = str_replace(array("\r\n", "\n", "\r"), '', $line);
+						$attr = explode('=>', $att);
+						$csv_header = $attr[0];
+						$attribute_code = $attr[1];
+						$attributes[$csv_header] = $attribute_code;
+					}
+					
+					foreach ($attributes as $code => $att) {
+						$values = $product->getValue($att, 'fr_FR', $this->getChannel());
+						if($att == 'price'){
+							$values = $product->getValue($att)->getPrice($currency)->getData();
+						}
+					    $data['product'][$i][$code] = $values;
+					}
+				}
+				++$i;
+			}
+		}
+        return $data;
+    }
+
+    /**
+     * @return array
+     */
+    public function getConfigurationFields()
+    {
+        return [
+            'channel' => [
+                'type'    => 'choice',
+                'options' => [
+                    'choices'  => $this->channelManager->getChannelChoices(),
+                    'required' => true,
+                    'select2'  => true,
+                    'label'    => 'pim_base_connector.export.channel.label',
+                    'help'     => 'pim_base_connector.export.channel.help',
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Set channel.
+     *
+     * @param string $channelCode Channel code
+     *
+     * @return $this
+     */
+    public function setChannel($channelCode)
+    {
+        $this->channel = $channelCode;
 
         return $this;
     }
 
     /**
-     * {@inheritdoc}
+     * Get channel.
+     *
+     * @return string Channel code
      */
-    public function process($item)
+    public function getChannel()
     {
-        /* $result = [];
-          $result['Identifier']                        = $item->getCode();
-          $result['type']                              = $this->processattributeType($item->getAttributeType());
-          $result['label_'. $this->getLanguage() ]     = $item->setLocale($this->getLanguage())->getLabel();
-          $result['Sequence']                          = 1;
-          $result['Displayable']                       = 'True';
-          $result['Searchable']                        = ($item->isUseableAsGridFilter()) ? 'True' : 'False';
-          $result['Comparable']                        = 'True';
-          $result['Delete']                            = '';
-         */
-        return $result;
+        return $this->channel;
     }
 
     /**
-     * {@inheritdoc}
+     * Get normalizer context.
+     *
+     * @return array $normalizerContext
      */
-    public function getConfigurationFields()
+    protected function getNormalizerContext()
     {
-    }
-
-    /**
-     * Get exportedAttributes.
-     * 
-     *  @param string $attributetype attributetype
-     * 
-     * @return string $attributetype attributetype
-     */
-    public function processattributeType($attributetype)
-    {
-        $pim_attribute_type_integer = array('pim_catalog_boolean', 'pim_catalog_number');
-        $pim_attribute_type_float = array('pim_catalog_mertic');
-        $pim_attribute_type_double = array('pim_catalog_price_collection');
-        $pim_attribute_type_string = array('pim_catalog_date', 'pim_catalog_file', 'pim_catalog_identifier', 'pim_catalog_image', 'pim_catalog_multiselect',
-            'pim_catalog_simpleselect', 'pim_catalog_text', 'pim_catalog_textarea', );
-        if (in_array($attributetype, $pim_attribute_type_integer)) {
-            $this->wcsattributetype = 'integer';
-        } elseif (in_array($attributetype, $pim_attribute_type_float)) {
-            $this->wcsattributetype = 'float';
-        } elseif (in_array($attributetype, $pim_attribute_type_double)) {
-            $this->wcsattributetype = 'double';
-        } elseif (in_array($attributetype, $pim_attribute_type_string)) {
-            $this->wcsattributetype = 'string';
-        } else {
-            $this->wcsattributetype = $attributetype;
+        if (null === $this->normalizerContext) {
+            $this->normalizerContext = [
+                'scopeCode'   => $this->channel,
+                'localeCodes' => $this->getLocaleCodes($this->channel),
+            ];
         }
 
-        return $this->wcsattributetype;
+        return $this->normalizerContext;
+    }
+
+    /**
+     * Get locale codes for a channel.
+     *
+     * @param string $channelCode
+     *
+     * @return array
+     */
+    protected function getLocaleCodes($channelCode)
+    {
+        $channel = $this->channelManager->getChannelByCode($channelCode);
+
+        return $channel->getLocaleCodes();
+    }
+
+    /**
+     * Fetch medias product values.
+     *
+     * @param ProductInterface $product
+     *
+     * @return ProductValueInterface[]
+     */
+    protected function getMediaProductValues(ProductInterface $product)
+    {
+        $values = [];
+        foreach ($product->getValues() as $value) {
+            if (in_array(
+                            $value->getAttribute()->getAttributeType(), $this->mediaAttributeTypes
+                    )) {
+                $values[] = $value;
+            }
+        }
+
+        return $values;
     }
 }

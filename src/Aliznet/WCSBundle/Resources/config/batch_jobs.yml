@@ -23,16 +23,17 @@ connector:
                         reader:    aliznet_wcs.reader.orm.attribute_values
                         processor: aliznet_wcs.processor.attribute_values
                         writer:    aliznet_wcs.writer.file.attribute.csv
-        #wcs_product_export:
-            #title: aliznet_wcs_export.jobs.wcs_product_export.title
-            #type:  export
-            #steps:
-                #export:
-                    #title:     aliznet_wcs_export.jobs.aliznet_wcs_product_export.export.title
-                    #services:
-                        #reader:    aliznet_wcs.reader.doctrine.product
-                        #processor: pim_base_connector.processor.product_to_flat_array
-                        #writer:    pim_base_connector.writer.file.csv_product
+        ## Export Products.
+        wcs_product_export:
+            title: aliznet_wcs_export.jobs.wcs_product_export.title
+            type:  export
+            steps:
+                export:
+                    title:     aliznet_wcs_export.jobs.wcs_product_export.export.title
+                    services:
+                        reader:    aliznet_wcs.reader.doctrine.product
+                        processor: aliznet_wcs.processor.product
+                        writer:    aliznet_wcs.writer.file.csv_product
         ## Export Categories.    
         wcs_category_export:
             title: aliznet_wcs_export.jobs.wcs_category_export.title
