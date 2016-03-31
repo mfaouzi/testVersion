@@ -2,8 +2,8 @@
 
 namespace Aliznet\WCSBundle\Reader\Doctrine;
 
-use Akeneo\Component\Batch\Model\StepExecution;
 use Akeneo\Component\Batch\Item\AbstractConfigurableStepElement;
+use Akeneo\Component\Batch\Model\StepExecution;
 use Doctrine\ORM\AbstractQuery;
 use Doctrine\ORM\EntityManager;
 use Pim\Bundle\BaseConnectorBundle\Reader\ProductReaderInterface;
@@ -111,6 +111,16 @@ class ProductReader extends AbstractConfigurableStepElement implements ProductRe
     protected $isComplete = true;
 
     /**
+     * @var localeRepository
+     */
+    protected $localeRepository;
+
+    /**
+     * @var string
+     */
+    protected $language;
+
+    /**
      * get exportFrom.
      *
      * @return string exportFrom
@@ -207,6 +217,28 @@ class ProductReader extends AbstractConfigurableStepElement implements ProductRe
     }
 
     /**
+     * get language.
+     *
+     * @return string language
+     */
+    public function getLanguage()
+    {
+        return $this->language;
+    }
+
+    /**
+     * Set language.
+     *
+     * @param string $language excludedCategories
+     *
+     * @return AbstractProcessor
+     */
+    public function setLanguage($language)
+    {
+        $this->language = $language;
+    }
+
+    /**
      * @param ProductRepositoryInterface $repository
      * @param ChannelManager             $channelManager
      * @param CompletenessManager        $completenessManager
@@ -215,7 +247,7 @@ class ProductReader extends AbstractConfigurableStepElement implements ProductRe
      * @param bool                       $missingCompleteness
      */
     public function __construct(
-    ProductRepositoryInterface $repository, ChannelManager $channelManager, CompletenessManager $completenessManager, MetricConverter $metricConverter, EntityManager $entityManager, $missingCompleteness = true
+    ProductRepositoryInterface $repository, ChannelManager $channelManager, $localeClass, CompletenessManager $completenessManager, MetricConverter $metricConverter, EntityManager $entityManager, $missingCompleteness = true
     ) {
         $this->entityManager = $entityManager;
         $this->repository = $repository;
@@ -224,6 +256,7 @@ class ProductReader extends AbstractConfigurableStepElement implements ProductRe
         $this->metricConverter = $metricConverter;
         $this->products = new \ArrayIterator();
         $this->missingCompleteness = $missingCompleteness;
+        $this->localeRepository = $entityManager->getRepository($localeClass);
     }
 
     /**
@@ -293,6 +326,15 @@ class ProductReader extends AbstractConfigurableStepElement implements ProductRe
                     'select2'  => true,
                     'label'    => 'pim_base_connector.export.channel.label',
                     'help'     => 'pim_base_connector.export.channel.help',
+                ),
+            ),
+            'language' => array(
+                'type'    => 'choice',
+                'options' => array(
+                    'choices'  => $this->getLanguages(),
+                    'required' => true,
+                    'label'    => 'aliznet_wcs_export.export.language.label',
+                    'help'     => 'aliznet_wcs_export.export.language.help',
                 ),
             ),
             'exportFrom' => array(
@@ -493,5 +535,19 @@ class ProductReader extends AbstractConfigurableStepElement implements ProductRe
         }
 
         return $products;
+    }
+
+    /**
+     * @return array
+     */
+    public function getLanguages()
+    {
+        $languages = $this->localeRepository->getActivatedLocaleCodes();
+        $languages_choices = [];
+        foreach ($languages as $language) {
+            $languages_choices[$language] = $language;
+        }
+
+        return $languages_choices;
     }
 }

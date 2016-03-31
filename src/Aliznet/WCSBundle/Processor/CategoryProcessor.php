@@ -60,7 +60,7 @@ class CategoryProcessor extends BaseTransformerProcessor
     /**
      * @param Category $item
      *
-     * @return array
+     * @return CategoryInterface[]
      */
     public function process($item)
     {

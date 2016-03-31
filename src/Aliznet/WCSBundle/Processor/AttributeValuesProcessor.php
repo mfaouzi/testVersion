@@ -59,7 +59,10 @@ class AttributeValuesProcessor extends AbstractConfigurableStepElement implement
             $result[$i]['ValueIdentifier'] = $item->getCode();
             $result[$i]['Sequence'] = 1;
             $result[$i]['value'] = $value->getValue();
-            $result[$i]['LanguageId'] = $value->getLocale();
+            $language = $value->getLocale();
+            $variable = constant('Aliznet\WCSBundle\Resources\Constant\Constants::'.$language);
+
+            $result[$i]['LanguageId'] = $variable;
             $result[$i]['Delete'] = '';
             ++$i;
         }

@@ -34,6 +34,29 @@ connector:
                         reader:    aliznet_wcs.reader.doctrine.product
                         processor: aliznet_wcs.processor.product
                         writer:    aliznet_wcs.writer.file.csv_product
+        ## Export Products and there associated attributes and values.
+        wcs_product_attribute_values_export:
+            title: aliznet_wcs_export.jobs.wcs_product_attribute_values_export.title
+            type:  export
+            steps:
+                export:
+                    title:     aliznet_wcs_export.wcs_product_attribute_values_export.export.title
+                    services:
+                        reader:    aliznet_wcs.reader.doctrine.productAttribute
+                        processor: aliznet_wcs.processor.product_attribute_value
+                        writer:    aliznet_wcs.writer.file.attribute.csv
+        
+        ## Export Products and there associated attributes and values.
+        wcs_product_desc_attribute_values_export:
+            title: aliznet_wcs_export.jobs.wcs_product_desc_attribute_values_export.title
+            type:  export
+            steps:
+                export:
+                    title:     aliznet_wcs_export.wcs_product_desc_attribute_values_export.export.title
+                    services:
+                        reader:    aliznet_wcs.reader.doctrine.productAttribute
+                        processor: aliznet_wcs.processor.desc_product_attribute_value
+                        writer:    aliznet_wcs.writer.file.attribute.csv
         ## Export Categories.    
         wcs_category_export:
             title: aliznet_wcs_export.jobs.wcs_category_export.title

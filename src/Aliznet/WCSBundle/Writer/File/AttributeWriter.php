@@ -3,6 +3,8 @@
 namespace Aliznet\WCSBundle\Writer\File;
 
 use Akeneo\Bundle\BatchBundle\Job\RuntimeErrorException;
+use Pim\Component\Connector\Writer\File\FilePathResolverInterface;
+use Pim\Component\Connector\Writer\File\SimpleFileWriter as BaseFileWriter;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
@@ -11,7 +13,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @author    aliznet
  * @copyright 2016 ALIZNET (www.aliznet.fr)
  */
-class AttributeWriter extends FileWriter
+class AttributeWriter extends BaseFileWriter
 {
     /**
      * @Assert\NotBlank
@@ -112,8 +114,12 @@ class AttributeWriter extends FileWriter
         return $this->writtenFiles;
     }
 
-    public function __construct()
+    /**
+     * @param FilePathResolverInterface $filePathResolver
+     */
+    public function __construct(FilePathResolverInterface $filePathResolver)
     {
+        parent::__construct($filePathResolver);
     }
 
     /**
@@ -167,7 +173,7 @@ class AttributeWriter extends FileWriter
                     'label' => 'pim_base_connector.export.withHeader.label',
                     'help'  => 'pim_base_connector.export.withHeader.help',
                 ),
-        ), ));
+            ), ));
     }
 
     /**
@@ -175,6 +181,9 @@ class AttributeWriter extends FileWriter
      */
     public function write(array $items)
     {
+        if (!is_dir(dirname($this->getPath()))) {
+            mkdir(dirname($this->getPath()), 0777, true);
+        }
         $this->items = array_merge($this->items, $items);
     }
 

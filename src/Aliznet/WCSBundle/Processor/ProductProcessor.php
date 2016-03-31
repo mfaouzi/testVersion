@@ -5,10 +5,10 @@ namespace Aliznet\WCSBundle\Processor;
 use Akeneo\Component\Batch\Item\AbstractConfigurableStepElement;
 use Akeneo\Component\Batch\Item\ItemProcessorInterface;
 use Pim\Bundle\BaseConnectorBundle\Validator\Constraints\Channel;
-use Pim\Component\Catalog\Builder\ProductBuilderInterface;
 use Pim\Bundle\CatalogBundle\Manager\ChannelManager;
-use Pim\Component\Catalog\Model\ProductInterface;
 use Pim\Bundle\CatalogBundle\Model\ProductValueInterface;
+use Pim\Component\Catalog\Builder\ProductBuilderInterface;
+use Pim\Component\Catalog\Model\ProductInterface;
 use Symfony\Component\Serializer\Serializer;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -70,67 +70,69 @@ class ProductProcessor extends AbstractConfigurableStepElement implements ItemPr
             $this->productBuilder->addMissingProductValues($product, [$contextChannel], $contextChannel->getLocales()->toArray());
         }
 
-		$groups = $product->getGroupCodes();
-		$categories = $product->getCategoryCodes();
-		
-		$prices = $product->getValue('price')->getPrices();
-		
-		$i = 0;
-		$data['product'] = [];
-		$data['media'] = [];
-		if(!empty($prices))
-		{
-			$currencies = [];
-			foreach ($prices as $price) {
-				$currencies[] = $price->getCurrency();
-			}
-			foreach ($currencies as $currency)
-			{
-				$mediaValues = $this->getMediaProductValues($product);
+        $groups = $product->getGroupCodes();
+        $categories = $product->getCategoryCodes();
 
-				foreach ($mediaValues as $mediaValue) {
-					$data['media'][$i][] = $this->serializer->normalize(
-						$mediaValue->getMedia(), 'flat', ['field_name' => 'media', 'prepare_copy' => true, 'value' => $mediaValue]
-					);
-				}
-				
-				$data['product'][$i]['PartNumber'] = $product->getValue('sku')->getProduct()->getLabel();
-				$data['product'][$i]['Type'] = 'ITEM';
-				$data['product'][$i]['ParentPartNumber'] = (empty($groups)) ? '' : $groups[0];
-				$data['product'][$i]['Sequence'] = '1';
-				$data['product'][$i]['ParentGroupIdentifier'] = (empty($categories)) ? '' : $categories[0];
-				$data['product'][$i]['Currency'] = $currency;
+        $prices = $product->getValue('price')->getPrices();
 
-				$filename = 'products_atrributes.txt';
-				$dir = dirname(dirname(dirname(dirname(dirname(__FILE__)))));
-				$file = $dir.'/web/WCS/'.$filename;
+        $i = 0;
+        $data['product'] = [];
+        $data['media'] = [];
+        if (!empty($prices)) {
+            $currencies = [];
+            foreach ($prices as $price) {
+                $currencies[] = $price->getCurrency();
+            }
+            foreach ($currencies as $currency) {
+                $mediaValues = $this->getMediaProductValues($product);
 
-				$filename = 'products_atrributes.txt';
-				$dir = dirname(dirname(dirname(dirname(dirname(__FILE__)))));
-				$file = $dir . '/web/WCS/' . $filename;
+                foreach ($mediaValues as $mediaValue) {
+                    $data['media'][$i][] = $this->serializer->normalize(
+                        $mediaValue->getMedia(), 'flat', ['field_name' => 'media', 'prepare_copy' => true, 'value' => $mediaValue]
+                    );
+                }
 
-				$attributes = [];
-				if (file_exists($file) && file($file)) {
-					$lines = file($file);
-					foreach ($lines as $line) {
-						$att = str_replace(array("\r\n", "\n", "\r"), '', $line);
-						$attr = explode('=>', $att);
-						$csv_header = $attr[0];
-						$attribute_code = $attr[1];
-						$attributes[$csv_header] = $attribute_code;
-					}
-					
-					foreach ($attributes as $code => $att) {
-						$values = $product->getValue($att, 'fr_FR', $this->getChannel());
-						if($att == 'price'){
-							$values = $product->getValue($att)->getPrice($currency)->getData();
-						}
-					    $data['product'][$i][$code] = $values;
-					}
-				}
-				++$i;
-			}
-		}
+                $data['product'][$i]['PartNumber'] = $product->getValue('sku')->getProduct()->getLabel();
+                $data['product'][$i]['Type'] = 'ITEM';
+                $data['product'][$i]['ParentPartNumber'] = (empty($groups)) ? '' : $groups[0];
+                $data['product'][$i]['Sequence'] = '1';
+                $data['product'][$i]['ParentGroupIdentifier'] = (empty($categories)) ? '' : $categories[0];
+                $data['product'][$i]['Currency'] = $currency;
+
+                $filename = 'products_atrributes.txt';
+                $dir = dirname(dirname(dirname(dirname(dirname(__FILE__)))));
+                $file = $dir.'/web/WCS/'.$filename;
+
+                $filename = 'products_atrributes.txt';
+                $dir = dirname(dirname(dirname(dirname(dirname(__FILE__)))));
+                $file = $dir.'/web/WCS/'.$filename;
+
+                $attributes = [];
+                if (file_exists($file) && file($file)) {
+                    $lines = file($file);
+                    foreach ($lines as $line) {
+                        $att = str_replace(array("\r\n", "\n", "\r"), '', $line);
+                        $attr = explode('=>', $att);
+                        $csv_header = $attr[0];
+                        $attribute_code = $attr[1];
+                        $attributes[$csv_header] = $attribute_code;
+                    }
+
+                    foreach ($attributes as $code => $att) {
+                        $values = $product->getValue($att, 'fr_FR', $this->getChannel());
+                        if ($att == 'price') {
+                            $values = $product->getValue($att)->getPrice($currency)->getData();
+                        }
+                        if ($att == 'ListPrice') {
+                            $values = $product->getValue($att)->getPrice($currency)->getData();
+                        }
+                        $data['product'][$i][$code] = $values;
+                    }
+                }
+                ++$i;
+            }
+        }
+
         return $data;
     }
 

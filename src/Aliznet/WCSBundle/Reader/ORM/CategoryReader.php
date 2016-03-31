@@ -2,8 +2,11 @@
 
 namespace Aliznet\WCSBundle\Reader\ORM;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Pim\Bundle\BaseConnectorBundle\Reader\Doctrine\Reader;
+use Pim\Component\Connector\Processor\Denormalization\AbstractProcessor;
+use Timestampable\Fixture\Type;
 
 /**
  * Category Reader.
@@ -29,11 +32,18 @@ class CategoryReader extends Reader
     protected $language;
 
     /**
-     * @param EntityRepository $categoryRepository
+     * @var localeRepository
      */
-    public function __construct(EntityRepository $categoryRepository)
+    protected $localeRepository;
+
+    /**
+     * @param EntityRepository $categoryRepository
+     * @param LocaleManager    $localManager
+     */
+    public function __construct(EntityManager $entityManager, EntityRepository $categoryRepository, $localeClass)
     {
         $this->categoryRepository = $categoryRepository;
+        $this->localeRepository = $entityManager->getRepository($localeClass);
     }
 
     /**
@@ -124,9 +134,9 @@ class CategoryReader extends Reader
                 }
             }
             $qb
-                    ->innerJoin('c.translations', 'at', 'WITH', 'at.locale='.'\''.$this->getLanguage().'\'')
-                    ->orderBy('c.root')
-                    ->addOrderBy('c.left');
+                ->innerJoin('c.translations', 'at', 'WITH', 'at.locale='.'\''.$this->getLanguage().'\'')
+                ->orderBy('c.root')
+                ->addOrderBy('c.left');
 
             $this->query = $qb->getQuery();
         }
@@ -135,6 +145,8 @@ class CategoryReader extends Reader
     }
 
     /**
+     * Get all children of a category by its code.
+     *
      * @param string $categoryCode
      *
      * @return query
@@ -198,12 +210,28 @@ class CategoryReader extends Reader
                 ),
             ),
             'language' => array(
+                'type'    => 'choice',
                 'options' => array(
+                    'choices'  => $this->getLanguages(),
                     'required' => true,
                     'label'    => 'aliznet_wcs_export.export.language.label',
                     'help'     => 'aliznet_wcs_export.export.language.help',
                 ),
             ),
         );
+    }
+
+    /**
+     * @return array
+     */
+    public function getLanguages()
+    {
+        $languages = $this->localeRepository->getActivatedLocaleCodes();
+        $languages_choices = [];
+        foreach ($languages as $language) {
+            $languages_choices[$language] = $language;
+        }
+
+        return $languages_choices;
     }
 }

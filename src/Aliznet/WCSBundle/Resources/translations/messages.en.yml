@@ -10,6 +10,12 @@ aliznet_wcs_export:
         wcs_product_export:
             title: WCS products export
             export.title: product export
+        wcs_product_attribute_values_export:
+            title: WCS products and there associated attributes of definition and values
+            export.title: products and there associated attributes of definition and values
+        wcs_product_desc_attribute_values_export:
+             title: WCS products and there associated attributes of description and values
+             export.title: WCS products and there associated attributes of description and values
         wcs_category_export:
             title: WCS Category export 
             export.title: category export
@@ -51,6 +57,9 @@ aliznet_wcs_export:
                 all: Export all
                 withoutPrices: All except prices
                 onlyPrices: Prices only
+        exportImages:
+            label: Export Images
+            help: Do we also export the images of the products
         excludedCategories:
             label: Excluded root categories
             help: Root categories codes to exclude (separated by comas, it will also exclude its children)

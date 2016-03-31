@@ -3,15 +3,17 @@
 namespace Aliznet\WCSBundle\Writer\File;
 
 use Akeneo\Bundle\BatchBundle\Job\RuntimeErrorException;
+use Pim\Component\Connector\Writer\File\FilePathResolverInterface;
+use Pim\Component\Connector\Writer\File\SimpleFileWriter as BaseFileWriter;
 use Symfony\Component\Validator\Constraints as Assert;
 
 /**
- * Category File riter.
+ * Category File writer.
  *
  * @author    aliznet
  * @copyright 2016 ALIZNET (www.aliznet.fr)
  */
-class CategoryFileWriter extends FileWriter
+class CategoryFileWriter extends BaseFileWriter
 {
     /**
      * @Assert\NotBlank
@@ -43,6 +45,11 @@ class CategoryFileWriter extends FileWriter
      * @var array
      */
     protected $items = [];
+
+    public function __construct(FilePathResolverInterface $filePathResolver)
+    {
+        parent::__construct($filePathResolver);
+    }
 
     /**
      * Set the csv delimiter character.
