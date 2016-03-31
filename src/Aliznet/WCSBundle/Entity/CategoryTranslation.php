@@ -4,13 +4,12 @@ namespace Aliznet\WCSBundle\Entity;
 
 use Pim\Bundle\CatalogBundle\Entity\CategoryTranslation as BaseCategoryTranslation;
 
-/*
- * CategoryTranslation entity
+/**
+ * CategoryTranslation entity.
+ *
  * @author    aliznet
  * @copyright 2016 ALIZNET (http://www.aliznet.fr/)
- * 
  */
-
 class CategoryTranslation extends BaseCategoryTranslation
 {
     /**

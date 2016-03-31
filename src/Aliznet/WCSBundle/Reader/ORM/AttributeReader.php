@@ -139,8 +139,8 @@ class AttributeReader extends Reader
                 ->createQueryBuilder('a')
                 ->leftJoin('a.translations', 'at', 'WITH', 'at.locale='.'\''.$this->getLanguage().'\'');
 
-        $this->QueryExludedWCSFields($qb);
-        $this->QueryAttributes($qb);
+        $this->queryExludedWCSFields($qb);
+        $this->queryAttributes($qb);
         $this->query = $qb->getQuery();
 
         return $this->query;
@@ -153,7 +153,7 @@ class AttributeReader extends Reader
      *
      * @return query
      */
-    public function QueryExludedWCSFields($qb)
+    public function queryExludedWCSFields($qb)
     {
         $filename = 'exluded_atrributes.txt';
         $dir = dirname(dirname(dirname(dirname(dirname(dirname(__FILE__))))));
@@ -177,23 +177,23 @@ class AttributeReader extends Reader
      *
      * @return query
      */
-    public function QueryAttributes($qb)
+    public function queryAttributes($qb)
     {
-        $include_exclude = $this->getIncludeexclude();
+        $includeExclude = $this->getIncludeexclude();
         $attributes = $this->getAttributes();
-        $attributes_config = explode(',', $attributes);
+        $attributesConfig = explode(',', $attributes);
 
         $condition = 'Where';
         if ($this->wcs) {
             $condition = 'andWhere';
         }
-        if (!empty($include_exclude)) {
-            switch ($include_exclude) {
-                case 'Exclude' :
-                    $qb->$condition($qb->expr()->orX($qb->expr()->notIn('a.code', $attributes_config)));
+        if (!empty($includeExclude)) {
+            switch ($includeExclude) {
+                case 'Exclude':
+                    $qb->$condition($qb->expr()->orX($qb->expr()->notIn('a.code', $attributesConfig)));
                     break;
                 case 'Include':
-                    $qb->$condition($qb->expr()->orX($qb->expr()->in('a.code', $attributes_config)));
+                    $qb->$condition($qb->expr()->orX($qb->expr()->in('a.code', $attributesConfig)));
                     break;
             }
         }

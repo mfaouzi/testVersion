@@ -82,23 +82,23 @@ class ProductAttributeDescValueProcessor extends AbstractConfigurableStepElement
 
         $i = 0;
         foreach ($product->getValues() as $value) {
-            $product_name = $product->getValue('sku')->getProduct()->getLabel();
-            $attr_code = '';
-            $attr_value = '';
+            $productName = $product->getValue('sku')->getProduct()->getLabel();
+            $attrCode = '';
+            $attrValue = '';
 
             $value->getAttribute()->setLocale($this->getLanguage());
             $parentGroup = $value->getAttribute()->getGroup()->getCode();
             $code = $value->getAttribute()->getCode();
             $attrValue = $product->getValue($code);
             if (!empty($code) && !empty($attrValue) && !empty($attrValue->__toString()) && $parentGroup === 'Descriptif') {
-                $attr_code = $value->getAttribute()->getCode();
-                $attr_value = $attrValue->__toString();
+                $attrCode = $value->getAttribute()->getCode();
+                $attrValue = $attrValue->__toString();
             }
 
-            if (!empty($product_name) && !empty($attr_code) && !empty($attr_value)) {
-                $data['product'][$i]['PartNumber'] = $product_name;
-                $data['product'][$i]['attribute'] = $attr_code;
-                $data['product'][$i]['values'] = $attr_value;
+            if (!empty($productName) && !empty($attrCode) && !empty($attrValue)) {
+                $data['product'][$i]['PartNumber'] = $productName;
+                $data['product'][$i]['attribute'] = $attrCode;
+                $data['product'][$i]['values'] = $attrValue;
                 $data['product'][$i]['delete'] = '0';
                 ++$i;
             }
@@ -162,8 +162,7 @@ class ProductAttributeDescValueProcessor extends AbstractConfigurableStepElement
 
     /**
      * Set exported categorie's language.
-     *
-     * @return string $language language
+     * @return \Aliznet\WCSBundle\Processor\ProductAttributeDescValueProcessor $language language
      */
     public function setLanguage($language)
     {

@@ -123,10 +123,11 @@ class ProductAttributeReader extends AbstractConfigurableStepElement implements 
     /**
      * @param ProductRepositoryInterface $repository
      * @param ChannelManager             $channelManager
+     * @param class                      $localeClass
      * @param CompletenessManager        $completenessManager
      * @param MetricConverter            $metricConverter
      * @param EntityManager              $entityManager
-     * @param bool                       $missingCompleteness
+     * @param type                       $missingCompleteness
      */
     public function __construct(
     ProductRepositoryInterface $repository, ChannelManager $channelManager, $localeClass, CompletenessManager $completenessManager, MetricConverter $metricConverter, EntityManager $entityManager, $missingCompleteness = true
@@ -363,7 +364,7 @@ class ProductAttributeReader extends AbstractConfigurableStepElement implements 
     }
 
     /**
-     * @return channel
+     * @return string
      */
     public function getChannel()
     {
@@ -402,8 +403,7 @@ class ProductAttributeReader extends AbstractConfigurableStepElement implements 
 
     /**
      * Set exported categorie's language.
-     *
-     * @return string $language language
+     * @return \Aliznet\WCSBundle\Reader\Doctrine\ProductAttributeReader $language language
      */
     public function setLanguage($language)
     {
@@ -539,14 +539,14 @@ class ProductAttributeReader extends AbstractConfigurableStepElement implements 
     /**
      * @return array
      */
-    public function getLanguages()
+    protected function getLanguages()
     {
         $languages = $this->localeRepository->getActivatedLocaleCodes();
-        $languages_choices = [];
+        $languagesChoices = [];
         foreach ($languages as $language) {
-            $languages_choices[$language] = $language;
+            $languagesChoices[$language] = $language;
         }
 
-        return $languages_choices;
+        return $languagesChoices;
     }
 }

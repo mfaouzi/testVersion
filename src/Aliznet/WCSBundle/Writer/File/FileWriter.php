@@ -16,8 +16,7 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @author    aliznet
  * @copyright 2016 ALIZNET (www.aliznet.fr)
  */
-class FileWriter extends AbstractConfigurableStepElement implements
-ItemWriterInterface, StepExecutionAwareInterface
+class FileWriter extends AbstractConfigurableStepElement implements ItemWriterInterface, StepExecutionAwareInterface
 {
     /**
      * @Assert\NotBlank(groups={"Execution"})
@@ -105,7 +104,7 @@ ItemWriterInterface, StepExecutionAwareInterface
     }
 
     /**
-     * 
+     * flush.
      */
     public function flush()
     {

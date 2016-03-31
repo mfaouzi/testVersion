@@ -113,9 +113,9 @@ class ProductProcessor extends AbstractConfigurableStepElement implements ItemPr
                     foreach ($lines as $line) {
                         $att = str_replace(array("\r\n", "\n", "\r"), '', $line);
                         $attr = explode('=>', $att);
-                        $csv_header = $attr[0];
-                        $attribute_code = $attr[1];
-                        $attributes[$csv_header] = $attribute_code;
+                        $csvHeader = $attr[0];
+                        $attributeCode = $attr[1];
+                        $attributes[$csvHeader] = $attributeCode;
                     }
 
                     foreach ($attributes as $code => $att) {
@@ -221,9 +221,7 @@ class ProductProcessor extends AbstractConfigurableStepElement implements ItemPr
     {
         $values = [];
         foreach ($product->getValues() as $value) {
-            if (in_array(
-                            $value->getAttribute()->getAttributeType(), $this->mediaAttributeTypes
-                    )) {
+            if (\in_array($value->getAttribute()->getAttributeType(), $this->mediaAttributeTypes)) {
                 $values[] = $value;
             }
         }

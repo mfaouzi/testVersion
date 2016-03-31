@@ -48,7 +48,10 @@ class CsvProductWriter extends BaseCsvWriter
     protected $fixedDatas = array('family', 'groups', 'categories', 'RELATED-groups', 'RELATED-products');
 
     /**
-     * @param MediaManager $mediaManager
+     * @param FilePathResolverInterface $filePathResolver
+     * @param BufferFactory             $bufferFactory
+     * @param type                      $entityManager
+     * @param ChannelManager            $channelManager
      */
     public function __construct(FilePathResolverInterface $filePathResolver, BufferFactory $bufferFactory, $entityManager, ChannelManager $channelManager)
     {
@@ -148,6 +151,61 @@ class CsvProductWriter extends BaseCsvWriter
     }
 
     /**
+     * Flush items into a csv file.
+     *
+     * @throws RuntimeErrorException
+     */
+    public function flush()
+    {
+        $this->writtenFiles[$this->getPath()] = basename($this->getPath());
+
+        $uniqueKeys = $this->getAllKeys($this->items);
+        $fullItems = $this->mergeKeys($uniqueKeys);
+        if (false === $csvFile = fopen($this->getPath(), 'w')) {
+            throw new RuntimeErrorException('Failed to open file %path%', ['%path%' => $this->getPath()]);
+        }
+
+        $header = $this->isWithHeader() ? $uniqueKeys : [];
+        if (false === fputcsv($csvFile, $header, $this->delimiter)) {
+            throw new RuntimeErrorException('Failed to write to file %path%', ['%path%' => $this->getPath()]);
+        }
+
+        foreach ($fullItems as $item) {
+            if (false === fputcsv($csvFile, $item, $this->delimiter, $this->enclosure)) {
+                throw new RuntimeErrorException('Failed to write to file %path%', ['%path%' => $this->getPath()]);
+            } elseif ($this->stepExecution) {
+                $this->stepExecution->incrementSummaryInfo('write');
+            }
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function getConfigurationFields()
+    {
+        return
+                array_merge(
+                array(
+            'exportPriceOnly' => array(
+                'type'    => 'choice',
+                'options' => array(
+                    'choices' => array(
+                        'all'           => 'aliznet_wcs_export.export.exportPriceOnly.choices.all',
+                        'withoutPrices' => 'aliznet_wcs_export.export.exportPriceOnly.choices.withoutPrices',
+                        'onlyPrices'    => 'aliznet_wcs_export.export.exportPriceOnly.choices.onlyPrices',
+                    ),
+                    'required' => true,
+                    'select2'  => true,
+                    'label'    => 'aliznet_wcs_export.export.exportPriceOnly.label',
+                    'help'     => 'aliznet_wcs_export.export.exportPriceOnly.help',
+                ),
+            ),
+                ), parent::getConfigurationFields()
+        );
+    }
+
+    /**
      * @param $item array
      * Get only prices or all data without prices
      *
@@ -212,7 +270,7 @@ class CsvProductWriter extends BaseCsvWriter
 
     /**
      * Remove all column of attributes with type media.
-     * 
+     *
      * @param array $item
      *
      * @return array
@@ -228,32 +286,6 @@ class CsvProductWriter extends BaseCsvWriter
         }
 
         return $item;
-    }
-
-    /**
-     * @return array
-     */
-    public function getConfigurationFields()
-    {
-        return
-                array_merge(
-                array(
-            'exportPriceOnly' => array(
-                'type'    => 'choice',
-                'options' => array(
-                    'choices' => array(
-                        'all'           => 'aliznet_wcs_export.export.exportPriceOnly.choices.all',
-                        'withoutPrices' => 'aliznet_wcs_export.export.exportPriceOnly.choices.withoutPrices',
-                        'onlyPrices'    => 'aliznet_wcs_export.export.exportPriceOnly.choices.onlyPrices',
-                    ),
-                    'required' => true,
-                    'select2'  => true,
-                    'label'    => 'aliznet_wcs_export.export.exportPriceOnly.label',
-                    'help'     => 'aliznet_wcs_export.export.exportPriceOnly.help',
-                ),
-            ),
-                ), parent::getConfigurationFields()
-        );
     }
 
     /**
@@ -297,34 +329,5 @@ class CsvProductWriter extends BaseCsvWriter
         }
 
         return $fullItems;
-    }
-
-    /**
-     * Flush items into a csv file.
-     *
-     * @throws RuntimeErrorException
-     */
-    public function flush()
-    {
-        $this->writtenFiles[$this->getPath()] = basename($this->getPath());
-
-        $uniqueKeys = $this->getAllKeys($this->items);
-        $fullItems = $this->mergeKeys($uniqueKeys);
-        if (false === $csvFile = fopen($this->getPath(), 'w')) {
-            throw new RuntimeErrorException('Failed to open file %path%', ['%path%' => $this->getPath()]);
-        }
-
-        $header = $this->isWithHeader() ? $uniqueKeys : [];
-        if (false === fputcsv($csvFile, $header, $this->delimiter)) {
-            throw new RuntimeErrorException('Failed to write to file %path%', ['%path%' => $this->getPath()]);
-        }
-
-        foreach ($fullItems as $item) {
-            if (false === fputcsv($csvFile, $item, $this->delimiter, $this->enclosure)) {
-                throw new RuntimeErrorException('Failed to write to file %path%', ['%path%' => $this->getPath()]);
-            } elseif ($this->stepExecution) {
-                $this->stepExecution->incrementSummaryInfo('write');
-            }
-        }
     }
 }

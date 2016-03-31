@@ -66,7 +66,7 @@ class AttributeValuesReader extends Reader
     /**
      * Set attributes.
      *
-     * @param string $attributes attributes
+     * @param string $attributes
      *
      * @return AbstractProcessor
      */
@@ -153,7 +153,7 @@ class AttributeValuesReader extends Reader
      *
      * @return query
      */
-    public function QueryExludedWCSFields($qb)
+    public function queryExludedWCSFields($qb)
     {
         $filename = 'exluded_atrributes.txt';
         $dir = dirname(dirname(dirname(dirname(dirname(dirname(__FILE__))))));
@@ -177,24 +177,25 @@ class AttributeValuesReader extends Reader
      *
      * @return query
      */
-    public function QueryAttributes($qb)
+    public function queryAttributes($qb)
     {
-        $include_exclude = $this->getIncludeexclude();
+        $includeExclude = $this->getIncludeexclude();
         $attributes = $this->getAttributes();
-        $attributes_config = explode(',', $attributes);
+        $attributesConfig = explode(',', $attributes);
 
         $condition = 'Where';
         if ($this->wcs) {
             $condition = 'andWhere';
         }
-        switch ($include_exclude):
-            case 'Exclude' :
-                $qb->$condition($qb->expr()->orX($qb->expr()->notIn('at.code', $attributes_config)));
-        break;
-        case 'Include':
-                $qb->$condition($qb->expr()->orX($qb->expr()->in('at.code', $attributes_config)));
-        break;
-        endswitch;
+        switch ($includeExclude) {
+
+            case 'Exclude':
+                $qb->$condition($qb->expr()->orX($qb->expr()->notIn('at.code', $attributesConfig)));
+                break;
+            case 'Include':
+                $qb->$condition($qb->expr()->orX($qb->expr()->in('at.code', $attributesConfig)));
+                break;
+        }
 
         return $qb;
     }

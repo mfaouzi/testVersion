@@ -7,7 +7,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 /**
  * Type for category properties.
- * 
+ *
  * @author    aliznet
  * @copyright 2016 ALIZNET (www.aliznet.fr)
  */

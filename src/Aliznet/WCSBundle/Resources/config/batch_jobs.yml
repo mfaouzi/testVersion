@@ -43,7 +43,7 @@ connector:
                     title:     aliznet_wcs_export.wcs_product_attribute_values_export.export.title
                     services:
                         reader:    aliznet_wcs.reader.doctrine.productAttribute
-                        processor: aliznet_wcs.processor.product_attribute_value
+                        processor: aliznet_wcs.processor.def_product_attribute_value
                         writer:    aliznet_wcs.writer.file.attribute.csv
         
         ## Export Products and there associated attributes and values.

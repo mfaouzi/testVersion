@@ -241,10 +241,11 @@ class ProductReader extends AbstractConfigurableStepElement implements ProductRe
     /**
      * @param ProductRepositoryInterface $repository
      * @param ChannelManager             $channelManager
+     * @param type                       $localeClass
      * @param CompletenessManager        $completenessManager
      * @param MetricConverter            $metricConverter
      * @param EntityManager              $entityManager
-     * @param bool                       $missingCompleteness
+     * @param type                       $missingCompleteness
      */
     public function __construct(
     ProductRepositoryInterface $repository, ChannelManager $channelManager, $localeClass, CompletenessManager $completenessManager, MetricConverter $metricConverter, EntityManager $entityManager, $missingCompleteness = true
@@ -364,9 +365,7 @@ class ProductReader extends AbstractConfigurableStepElement implements ProductRe
     }
 
     /**
-     * initialize.
-     *
-     * @param empty
+     * intialize.
      */
     public function initialize()
     {
@@ -386,7 +385,7 @@ class ProductReader extends AbstractConfigurableStepElement implements ProductRe
     }
 
     /**
-     * @return channel
+     * @return string
      */
     public function getChannel()
     {
@@ -457,7 +456,7 @@ class ProductReader extends AbstractConfigurableStepElement implements ProductRe
      * Get product collection by channel and completness.
      *
      * @param type $channel
-     * @param type $isComplete
+     * @param boolean $isComplete
      *
      * @return type
      */
@@ -540,14 +539,14 @@ class ProductReader extends AbstractConfigurableStepElement implements ProductRe
     /**
      * @return array
      */
-    public function getLanguages()
+    protected function getLanguages()
     {
         $languages = $this->localeRepository->getActivatedLocaleCodes();
-        $languages_choices = [];
+        $languagesChoices = [];
         foreach ($languages as $language) {
-            $languages_choices[$language] = $language;
+            $languagesChoices[$language] = $language;
         }
 
-        return $languages_choices;
+        return $languagesChoices;
     }
 }

@@ -46,6 +46,9 @@ class CategoryFileWriter extends BaseFileWriter
      */
     protected $items = [];
 
+    /**
+     * @param FilePathResolverInterface $filePathResolver
+     */
     public function __construct(FilePathResolverInterface $filePathResolver)
     {
         parent::__construct($filePathResolver);

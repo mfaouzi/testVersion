@@ -34,9 +34,9 @@ class AttributeValuesProcessor extends AbstractConfigurableStepElement implement
     }
 
     /**
-     * Set exportedAttributes.
+     * @param type $language
      *
-     * @return string $language language
+     * @return \Aliznet\WCSBundle\Processor\AttributeValuesProcessor
      */
     public function setLanguage($language)
     {

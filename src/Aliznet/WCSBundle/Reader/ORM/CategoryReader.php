@@ -6,7 +6,6 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Pim\Bundle\BaseConnectorBundle\Reader\Doctrine\Reader;
 use Pim\Component\Connector\Processor\Denormalization\AbstractProcessor;
-use Timestampable\Fixture\Type;
 
 /**
  * Category Reader.
@@ -37,8 +36,9 @@ class CategoryReader extends Reader
     protected $localeRepository;
 
     /**
+     * @param EntityManager    $entityManager
      * @param EntityRepository $categoryRepository
-     * @param LocaleManager    $localManager
+     * @param string           $localeClass
      */
     public function __construct(EntityManager $entityManager, EntityRepository $categoryRepository, $localeClass)
     {
@@ -145,58 +145,6 @@ class CategoryReader extends Reader
     }
 
     /**
-     * Get all children of a category by its code.
-     *
-     * @param string $categoryCode
-     *
-     * @return query
-     */
-    protected function getCategoryChildren($categoryCode)
-    {
-        $categoryId = $this->getCategoryId($categoryCode);
-        if ($categoryId == null) {
-            return;
-        }
-        $qb = $this->categoryRepository->createQueryBuilder('c');
-        $qb->select('c.code')
-                ->where(
-                        $qb->expr()->orX(
-                                $qb->expr()->eq('c.parent', ':parent')
-                        )
-                )
-                ->setParameter('parent', $categoryId['id'])
-                ->orwhere(
-                        $qb->expr()->orX(
-                                $qb->expr()->eq('c.root', ':root')
-                        )
-                )
-                ->setParameter('root', $categoryId['id']);
-
-        return $qb->getQuery()->getResult();
-    }
-
-    /**
-     * Get category ID by its code.
-     *
-     * @param string $categoryCode
-     *
-     * @return category
-     */
-    protected function getCategoryId($categoryCode)
-    {
-        $qb = $this->categoryRepository->createQueryBuilder('c');
-        $qb->select('c.id')
-                ->where(
-                        $qb->expr()->orX(
-                                $qb->expr()->eq('c.code', ':code')
-                        )
-                )
-                ->setParameter('code', $categoryCode);
-
-        return $qb->getQuery()->getOneOrNullResult();
-    }
-
-    /**
      * @return array
      */
     public function getConfigurationFields()
@@ -227,11 +175,63 @@ class CategoryReader extends Reader
     public function getLanguages()
     {
         $languages = $this->localeRepository->getActivatedLocaleCodes();
-        $languages_choices = [];
+        $languagesChoices = [];
         foreach ($languages as $language) {
-            $languages_choices[$language] = $language;
+            $languagesChoices[$language] = $language;
         }
 
-        return $languages_choices;
+        return $languagesChoices;
+    }
+
+    /**
+     * Get category ID by its code.
+     *
+     * @param string $categoryCode
+     *
+     * @return category
+     */
+    protected function getCategoryId($categoryCode)
+    {
+        $qb = $this->categoryRepository->createQueryBuilder('c');
+        $qb->select('c.id')
+                ->where(
+                        $qb->expr()->orX(
+                                $qb->expr()->eq('c.code', ':code')
+                        )
+                )
+                ->setParameter('code', $categoryCode);
+
+        return $qb->getQuery()->getOneOrNullResult();
+    }
+
+    /**
+     * Get all children of a category by its code.
+     *
+     * @param string $categoryCode
+     *
+     * @return query
+     */
+    protected function getCategoryChildren($categoryCode)
+    {
+        $categoryId = $this->getCategoryId($categoryCode);
+        if ($categoryId == null) {
+            return;
+        }
+        $qb = $this->categoryRepository->createQueryBuilder('c');
+        $qb->select('c.code')
+                ->where(
+                        $qb->expr()->orX(
+                                $qb->expr()->eq('c.parent', ':parent')
+                        )
+                )
+                ->setParameter('parent', $categoryId['id'])
+                ->orwhere(
+                        $qb->expr()->orX(
+                                $qb->expr()->eq('c.root', ':root')
+                        )
+                )
+                ->setParameter('root', $categoryId['id']);
+
+        return $qb->getQuery()->getResult();
     }
 }

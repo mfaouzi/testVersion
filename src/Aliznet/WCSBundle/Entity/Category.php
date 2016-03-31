@@ -7,11 +7,11 @@ use Akeneo\Component\Localization\Model\TranslationInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Pim\Component\Catalog\Model\CategoryInterface;
 
-/*
- * Category entity
+/**
+ * Category entity.
+ *
  * @author    aliznet
  * @copyright 2016 ALIZNET (http://www.aliznet.fr/)
- * 
  */
 class Category extends BaseCategory implements CategoryInterface
 {
@@ -57,7 +57,7 @@ class Category extends BaseCategory implements CategoryInterface
     }
 
     /**
-     * @return has products
+     * @return boolean products
      */
     public function hasProducts()
     {
@@ -225,7 +225,7 @@ class Category extends BaseCategory implements CategoryInterface
     }
 
     /**
-     * Returns Integer.
+     * @return Description Integer.
      */
     public function getDisplay()
     {
@@ -243,9 +243,9 @@ class Category extends BaseCategory implements CategoryInterface
     }
 
     /**
-     * Set label.
+     * Set Display.
      *
-     * @param string $label
+     * @param string $display
      *
      * @return CategoryInterface
      */

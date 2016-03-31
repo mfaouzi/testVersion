@@ -30,9 +30,9 @@ class CategoryProcessor extends BaseTransformerProcessor
     }
 
     /**
-     * Set exportedAttributes.
+     * @param type $language
      *
-     * @return string $language language
+     * @return \Aliznet\WCSBundle\Processor\CategoryProcessor
      */
     public function setLanguage($language)
     {
