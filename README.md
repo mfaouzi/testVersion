@@ -74,10 +74,11 @@ Aliznet WCS Connector is extension that allows you to import your catalog from A
 ```
 
 ## Import these files into Akeneo interface
-> WCSBundle\Resources\fixtures\wcs-family.csv in Collect > import profiles > csv_family_import
-> WCSBundle\Resources\fixtures\wcs-attributes.csv in Collect > import profiles > csv_attribute_import
-> WCSBundle\Resources\fixtures\wcs-variant_group.csv in Collect > import profiles > csv_variant_group_import
-> WCSBundle\Resources\fixtures\wcs-product-ecommerce.csv in Collect > import profiles > csv_product_import	**for ecommerce channel**
-> WCSBundle\Resources\fixtures\wcs-product-print.csv in Collect > import profiles > csv_product_import	**for print channel**
-> WCSBundle\Resources\fixtures\wcs-product-mobile.csv in Collect > import profiles > csv_product_import	**for mobile channel**
-
+``` 
+	WCSBundle\Resources\fixtures\wcs-family.csv in Collect > import profiles > csv_family_import
+ 	WCSBundle\Resources\fixtures\wcs-attributes.csv in Collect > import profiles > csv_attribute_import
+ 	WCSBundle\Resources\fixtures\wcs-variant_group.csv in Collect > import profiles > csv_variant_group_import
+ 	WCSBundle\Resources\fixtures\wcs-product-ecommerce.csv in Collect > import profiles > csv_product_import	**for ecommerce channel**
+ 	WCSBundle\Resources\fixtures\wcs-product-print.csv in Collect > import profiles > csv_product_import	    **for print channel**
+ 	WCSBundle\Resources\fixtures\wcs-product-mobile.csv in Collect > import profiles > csv_product_import	    **for mobile channel**
+```
