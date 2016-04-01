@@ -31,7 +31,7 @@ Aliznet WCS Connector is extension that allows you to import your catalog from A
 
 - apply the script to your Akeneo database :
 ```
-	Resources/sql/mapping_migration.schema.sql
+	src/Aliznet/WCSBundle/Resources/sql/mapping_migration.schema.sql
 ```
 
 - run:
@@ -54,8 +54,8 @@ Aliznet WCS Connector is extension that allows you to import your catalog from A
 
 ## Import these files into Akeneo interface
 ```
-	**import\wcs-family.csv** in **Collect > import profiles > csv_family_import**
-	**import\wcs-attributes.csv** in **Collect > import profiles > csv_attribute_import**
+	import\wcs-family.csv in Collect > import profiles > csv_family_import
+	import\wcs-attributes.csv in Collect > import profiles > csv_attribute_import
 ```
 
 
