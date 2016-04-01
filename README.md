@@ -34,6 +34,25 @@ Aliznet WCS Connector is extension that allows you to import your catalog from A
 	WCSBundle/Resources/sql/mapping_migration.schema.sql
 ```
 
+## Update your AppKernel.php
+	- Add those two lines from your app/AppKernel.php file:
+	```
+		$bundles[] = new Aliznet\WCSBundle\AliznetWCSBundle();
+		$bundles[] = new new Aliznet\EnrichBundle\AliznetEnrichBundle();
+	```
+
+## Update your config.yml
+	- Add these lines from your app/config/config.yml file after this line **akeneo_storage_utils:** :
+	```
+		mapping_overrides:
+			-
+				original: Pim\Bundle\CatalogBundle\Entity\Category
+				override: Aliznet\WCSBundle\Entity\Category
+			-
+				original: Pim\Bundle\CatalogBundle\Entity\CategoryTranslation
+				override: Aliznet\WCSBundle\Entity\CategoryTranslation
+	```
+
 - run:
 ```
 	php app/console doctrine:schema:update --force
@@ -54,6 +73,6 @@ Aliznet WCS Connector is extension that allows you to import your catalog from A
 
 ## Import these files into Akeneo interface
 ```
-	import\wcs-family.csv in Collect > import profiles > csv_family_import
-	import\wcs-attributes.csv in Collect > import profiles > csv_attribute_import
+	WCSBundle\Resources\fixtures\wcs-family.csv in Collect > import profiles > csv_family_import
+	WCSBundle\Resources\fixtures\wcs-attributes.csv in Collect > import profiles > csv_attribute_import
 ```
