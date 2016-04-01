@@ -7,17 +7,20 @@ Aliznet
 				  |
 				  |____Category.php
 				  |____CategoryTranslation.php
-				  |____Attribute.php
 		   |____Processor
 				  |
 				  |____CategoryProcessor.php
 				  |____AttributeProcessor.php
 				  |____AttributeValuesProcessor.php
+				  |____ProductAttributeDefValueProcessor.php
+				  |____ProductAttributeDescValueProcessor.php
+				  |____ProductProcessor.php
 		   |____Reader
 				  |
 				  |____Doctrine
 				  |		  |
 				  |		  |____ProductReader.php
+				  |		  |____ProductAttributeReader
 				  |____ORM
 						|
 						|____CategoryReader.php
@@ -28,6 +31,9 @@ Aliznet
 					|____translations
 					|		  |
 					|		  |____messages.en.yml
+					|____sql
+					|		  |
+					|		  |____mapping_migration.schema.sql
 					|____config
 						   |
 						   |____doctrine
@@ -49,7 +55,8 @@ Aliznet
 						|____CategoryFileWriter.php
 						|____AttributeWriter.php
 						|____CsvWriter.php
-						|____FileWriter.php	
+						|____FileWriter.php
+						|____CsvProductWriter.php						
   |____EnrichBundle
 			  |
 			  |____Form
