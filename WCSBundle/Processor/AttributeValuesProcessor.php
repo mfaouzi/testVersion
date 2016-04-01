@@ -2,8 +2,10 @@
 
 namespace Aliznet\WCSBundle\Processor;
 
-use Akeneo\Component\Batch\Item\AbstractConfigurableStepElement;
 use Akeneo\Component\Batch\Item\ItemProcessorInterface;
+use Pim\Bundle\CatalogBundle\Entity\Attribute;
+use Pim\Bundle\CatalogBundle\Manager\ChannelManager;
+use Pim\Component\Catalog\Builder\ProductBuilderInterface;
 
 /**
  * Attribute Values Processor.
@@ -11,39 +13,25 @@ use Akeneo\Component\Batch\Item\ItemProcessorInterface;
  * @author    aliznet
  * @copyright 2016 ALIZNET (www.aliznet.fr)
  */
-class AttributeValuesProcessor extends AbstractConfigurableStepElement implements ItemProcessorInterface
+class AttributeValuesProcessor extends ProcessorHelper implements ItemProcessorInterface
 {
     /**
      * @var string
      */
     protected $wcsattributetype;
 
-    /**
-     * @var string
-     */
-    protected $language;
-
-    /**
-     * get language.
-     *
-     * @return string language
-     */
-    public function getLanguage()
-    {
-        return $this->language;
-    }
-
-    /**
-     * @param type $language
-     *
-     * @return \Aliznet\WCSBundle\Processor\AttributeValuesProcessor
-     */
-    public function setLanguage($language)
-    {
-        $this->language = $language;
-
-        return $this;
-    }
+     /**
+      * @param ChannelManager          $channelManager
+      * @param string[]                $mediaAttributeTypes
+      * @param ProductBuilderInterface $productBuilder
+      */
+     public function __construct(
+        ChannelManager $channelManager,
+        array $mediaAttributeTypes,
+        ProductBuilderInterface $productBuilder = null
+    ) {
+         parent::__construct($channelManager, $mediaAttributeTypes, $productBuilder);
+     }
 
     /**
      * @param Attribute $item
@@ -68,21 +56,5 @@ class AttributeValuesProcessor extends AbstractConfigurableStepElement implement
         }
 
         return $result;
-    }
-
-    /**
-     * @return array
-     */
-    public function getConfigurationFields()
-    {
-        return array(
-            'language' => array(
-                'options' => array(
-                    'required' => false,
-                    'label'    => 'aliznet_wcs_export.export.language.label',
-                    'help'     => 'aliznet_wcs_export.export.language.help',
-                ),
-            ),
-        );
     }
 }

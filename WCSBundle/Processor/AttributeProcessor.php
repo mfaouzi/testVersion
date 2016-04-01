@@ -2,8 +2,9 @@
 
 namespace Aliznet\WCSBundle\Processor;
 
-use Akeneo\Component\Batch\Item\AbstractConfigurableStepElement;
 use Akeneo\Component\Batch\Item\ItemProcessorInterface;
+use Pim\Bundle\CatalogBundle\Manager\ChannelManager;
+use Pim\Component\Catalog\Builder\ProductBuilderInterface;
 
 /**
  * Attribute Processor.
@@ -11,41 +12,25 @@ use Akeneo\Component\Batch\Item\ItemProcessorInterface;
  * @author    aliznet
  * @copyright 2016 ALIZNET (www.aliznet.fr)
  */
-class AttributeProcessor extends AbstractConfigurableStepElement implements ItemProcessorInterface
+class AttributeProcessor extends ProcessorHelper implements ItemProcessorInterface
 {
     /**
      * @var string
      */
     protected $wcsattributetype;
 
-    /**
-     * @var string
-     */
-    protected $language;
-
-    /**
-     * get language.
-     *
-     * @return string language
-     */
-    public function getLanguage()
-    {
-        return $this->language;
-    }
-
-    /**
-     * Set exportedAttributes.
-     *
-     * @param type $language
-     *
-     * @return \Aliznet\WCSBundle\Processor\AttributeProcessor
-     */
-    public function setLanguage($language)
-    {
-        $this->language = $language;
-
-        return $this;
-    }
+     /**
+      * @param ChannelManager          $channelManager
+      * @param string[]                $mediaAttributeTypes
+      * @param ProductBuilderInterface $productBuilder
+      */
+     public function __construct(
+        ChannelManager $channelManager,
+        array $mediaAttributeTypes,
+        ProductBuilderInterface $productBuilder = null
+    ) {
+         parent::__construct($channelManager, $mediaAttributeTypes, $productBuilder);
+     }
 
     /**
      * @param type $item
@@ -61,26 +46,10 @@ class AttributeProcessor extends AbstractConfigurableStepElement implements Item
         $result['Sequence'] = 1;
         $result['Displayable'] = 'True';
         $result['Searchable'] = ($item->isUseableAsGridFilter()) ? 'True' : 'False';
-        $result['Comparable'] = 'True';
+        $result['Comparable'] = '';
         $result['Delete'] = '';
 
         return $result;
-    }
-
-    /**
-     * @return array
-     */
-    public function getConfigurationFields()
-    {
-        return array(
-            'language' => array(
-                'options' => array(
-                    'required' => false,
-                    'label'    => 'aliznet_wcs_export.export.language.label',
-                    'help'     => 'aliznet_wcs_export.export.language.help',
-                ),
-            ),
-        );
     }
 
     /**

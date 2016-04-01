@@ -20,11 +20,6 @@ use Symfony\Component\Validator\Constraints as Assert;
 class CsvProductWriter extends BaseCsvWriter
 {
     /**
-     * @var string
-     */
-    protected $exportPriceOnly;
-
-    /**
      * Assert\NotBlank(groups={"Execution"})
      * Channel.
      *
@@ -81,30 +76,6 @@ class CsvProductWriter extends BaseCsvWriter
     }
 
     /**
-     * get exportPriceOnly.
-     *
-     * @return string exportPriceOnly
-     */
-    public function getExportPriceOnly()
-    {
-        return $this->exportPriceOnly;
-    }
-
-    /**
-     * Set exportPriceOnly.
-     *
-     * @param string $exportPriceOnly exportPriceOnly
-     *
-     * @return AbstractProcessor
-     */
-    public function setExportPriceOnly($exportPriceOnly)
-    {
-        $this->exportPriceOnly = $exportPriceOnly;
-
-        return $this;
-    }
-
-    /**
      * @param array $items
      */
     public function write(array $items)
@@ -116,9 +87,7 @@ class CsvProductWriter extends BaseCsvWriter
         }
 
         foreach ($items as $item) {
-            $item['product'] = $this->getProductPricesOnly($item['product']);
             $item['product'] = $this->formatMetricsColumns($item['product']);
-            //$products[] = ($this->getExportImages()) ? $item['product'] : $this->removeMediaColumns($item['product']);
             $products[] = $item['product'];
         }
 
@@ -184,65 +153,7 @@ class CsvProductWriter extends BaseCsvWriter
      */
     public function getConfigurationFields()
     {
-        return
-                array_merge(
-                array(
-            'exportPriceOnly' => array(
-                'type'    => 'choice',
-                'options' => array(
-                    'choices' => array(
-                        'all'           => 'aliznet_wcs_export.export.exportPriceOnly.choices.all',
-                        'withoutPrices' => 'aliznet_wcs_export.export.exportPriceOnly.choices.withoutPrices',
-                        'onlyPrices'    => 'aliznet_wcs_export.export.exportPriceOnly.choices.onlyPrices',
-                    ),
-                    'required' => true,
-                    'select2'  => true,
-                    'label'    => 'aliznet_wcs_export.export.exportPriceOnly.label',
-                    'help'     => 'aliznet_wcs_export.export.exportPriceOnly.help',
-                ),
-            ),
-                ), parent::getConfigurationFields()
-        );
-    }
-
-    /**
-     * @param $item array
-     * Get only prices or all data without prices
-     *
-     * @return array
-     */
-    protected function getProductPricesOnly($item)
-    {
-        if ($this->getExportPriceOnly() == 'all') {
-            return $item;
-        }
-        $attributeEntity = $this->entityManager->getRepository('Pim\Bundle\CatalogBundle\Entity\Attribute');
-        $attributes = $attributeEntity->getNonIdentifierAttributes();
-        foreach ($attributes as $attribute) {
-            if ($this->getExportPriceOnly() == 'onlyPrices') {
-                if ($attribute->getBackendType() != 'prices') {
-                    $attributesToRemove = preg_grep('/^'.$attribute->getCode().'D*/', array_keys($item));
-                    foreach ($attributesToRemove as $attributeToRemove) {
-                        unset($item[$attributeToRemove]);
-                    }
-                }
-            } elseif ($this->getExportPriceOnly() == 'withoutPrices') {
-                if ($attribute->getBackendType() == 'prices') {
-                    $attributesToRemove = preg_grep('/^'.$attribute->getCode().'D*/', array_keys($item));
-                    foreach ($attributesToRemove as $attributeToRemove) {
-                        unset($item[$attributeToRemove]);
-                    }
-                }
-            }
-        }
-
-        if ($this->getExportPriceOnly() == 'onlyPrices') {
-            foreach ($this->fixedDatas as $fixedData) {
-                unset($item[$fixedData]);
-            }
-        }
-
-        return $item;
+        return parent::getConfigurationFields();
     }
 
     /**

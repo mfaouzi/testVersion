@@ -3,35 +3,20 @@
 namespace Aliznet\WCSBundle\Reader\ORM;
 
 use Doctrine\ORM\EntityManager;
-use Pim\Bundle\BaseConnectorBundle\Reader\Doctrine\Reader;
 
 /**
- * Product Reader.
+ * Attribute Reader.
  *
  * @author    aliznet
  * @copyright 2016 ALIZNET (www.aliznet.fr)
  */
-class AttributeReader extends Reader
+class AttributeReader extends AttributeReaderHelper
 {
-    /**
-     * @var EntityManager
+    /*
+     * @var localeRepository
      */
-    protected $em;
 
-    /**
-     * @var string
-     */
-    protected $className;
-
-    /**
-     * @var string
-     */
-    protected $attributes;
-
-    /**
-     * @var string
-     */
-    protected $includeexclude;
+    protected $localeRepository;
 
     /**
      * @var string
@@ -52,57 +37,12 @@ class AttributeReader extends Reader
      * @param EntityManager $em        The entity manager
      * @param string        $className The entity class name used
      */
-    public function __construct(EntityManager $em, $className)
+    public function __construct(EntityManager $em, $className, $localeClass)
     {
         $this->em = $em;
         $this->className = $className;
         $this->groupNumber = 0;
-    }
-
-    /**
-     * get attributes.
-     *
-     * @return string attributes
-     */
-    public function getAttributes()
-    {
-        return $this->attributes;
-    }
-
-    /**
-     * Set attributes.
-     *
-     * @param string $attributes attributes
-     *
-     * @return AbstractProcessor
-     */
-    public function setAttributes($attributes)
-    {
-        $this->attributes = $attributes;
-
-        return $this;
-    }
-
-    /**
-     * get includeexclude.
-     *
-     * @return string includeexclude
-     */
-    public function getIncludeexclude()
-    {
-        return $this->includeexclude;
-    }
-
-    /**
-     * Set includeexclude.
-     *
-     * @param string $includeexclude includeexclude
-     *
-     * @return AbstractProcessor
-     */
-    public function setIncludeexclude($includeexclude)
-    {
-        $this->includeexclude = $includeexclude;
+        $this->localeRepository = $em->getRepository($localeClass);
     }
 
     /**
@@ -139,66 +79,11 @@ class AttributeReader extends Reader
                 ->createQueryBuilder('a')
                 ->leftJoin('a.translations', 'at', 'WITH', 'at.locale='.'\''.$this->getLanguage().'\'');
 
-        $this->queryExludedWCSFields($qb);
-        $this->queryAttributes($qb);
+        $this->QueryExludedWCSFields($qb, 'a');
+        $this->QueryAttributes($qb, 'a');
         $this->query = $qb->getQuery();
 
         return $this->query;
-    }
-
-    /**
-     * Exclude WCS fileds from attributes export.
-     *
-     * @param query $qb
-     *
-     * @return query
-     */
-    public function queryExludedWCSFields($qb)
-    {
-        $filename = 'exluded_atrributes.txt';
-        $dir = dirname(dirname(dirname(dirname(dirname(dirname(__FILE__))))));
-        $file = $dir.'/web/WCS/'.$filename;
-        if (file_exists($file) && file($file)) {
-            $lines = file($file);
-            $fields = str_replace(array("\r\n", "\n", "\r"), '', $lines);
-            $qb->where($qb->expr()->orX($qb->expr()->notIn('a.code', $fields)));
-            $this->wcs = true;
-        } else {
-            $this->wcs = false;
-        }
-
-        return $qb;
-    }
-
-    /**
-     * Include or exclude attributes in the configuration field from export.
-     *
-     * @param query $qb
-     *
-     * @return query
-     */
-    public function queryAttributes($qb)
-    {
-        $includeExclude = $this->getIncludeexclude();
-        $attributes = $this->getAttributes();
-        $attributesConfig = explode(',', $attributes);
-
-        $condition = 'Where';
-        if ($this->wcs) {
-            $condition = 'andWhere';
-        }
-        if (!empty($includeExclude)) {
-            switch ($includeExclude) {
-                case 'Exclude':
-                    $qb->$condition($qb->expr()->orX($qb->expr()->notIn('a.code', $attributesConfig)));
-                    break;
-                case 'Include':
-                    $qb->$condition($qb->expr()->orX($qb->expr()->in('a.code', $attributesConfig)));
-                    break;
-            }
-        }
-
-        return $qb;
     }
 
     /**
@@ -206,30 +91,31 @@ class AttributeReader extends Reader
      */
     public function getConfigurationFields()
     {
-        return array(
-            'includeexclude' => array(
+        return array_merge(array(
+            'language' => array(
                 'type'    => 'choice',
                 'options' => array(
-                    'choices'  => array('Exclude' => 'Exclude', 'Include' => 'Include'),
-                    'required' => false,
-                    'label'    => 'aliznet_wcs_export.export.includeexclude.label',
-                    'help'     => 'aliznet_wcs_export.export.includeexclude.help',
-                ),
-            ),
-            'attributes' => array(
-                'options' => array(
-                    'required' => false,
-                    'label'    => 'aliznet_wcs_export.export.Attributes.label',
-                    'help'     => 'aliznet_wcs_export.export.Attributes.help',
-                ),
-            ),
-            'language' => array(
-                'options' => array(
+                    'choices'  => $this->getLanguages(),
                     'required' => true,
+                    'select2'  => true,
                     'label'    => 'aliznet_wcs_export.export.language.label',
                     'help'     => 'aliznet_wcs_export.export.language.help',
                 ),
             ),
-        );
+                ), parent::getConfigurationFields());
+    }
+
+    /**
+     * @return array
+     */
+    public function getLanguages()
+    {
+        $languages = $this->localeRepository->getActivatedLocaleCodes();
+        $languages_choices = [];
+        foreach ($languages as $language) {
+            $languages_choices[$language] = $language;
+        }
+
+        return $languages_choices;
     }
 }

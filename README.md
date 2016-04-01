@@ -7,9 +7,9 @@ Aliznet WCS Connector is extension that allows you to import your catalog from A
 
 ## Installation
 
-### Via composer
+### Via composer : 
 
-- Add into `composer.json` in the `require` section:
+- Add into in the `require` section:
 
 `"aliznet":"dev-master"`
 

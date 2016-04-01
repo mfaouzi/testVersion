@@ -2,15 +2,9 @@
 
 namespace Aliznet\WCSBundle\Processor;
 
-use Akeneo\Component\Batch\Item\AbstractConfigurableStepElement;
 use Akeneo\Component\Batch\Item\ItemProcessorInterface;
-use Pim\Bundle\BaseConnectorBundle\Validator\Constraints\Channel;
 use Pim\Bundle\CatalogBundle\Manager\ChannelManager;
 use Pim\Component\Catalog\Builder\ProductBuilderInterface;
-use Pim\Component\Catalog\Model\ProductInterface;
-use Pim\Component\Catalog\Model\ProductValueInterface;
-use Symfony\Component\Serializer\Serializer;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Product Attribute Value Processor for definitions attributes.
@@ -18,49 +12,19 @@ use Symfony\Component\Validator\Constraints as Assert;
  * @author    aliznet
  * @copyright 2016 ALIZNET (www.aliznet.fr)
  */
-class ProductAttributeDefValueProcessor extends AbstractConfigurableStepElement implements ItemProcessorInterface
+class ProductAttributeDefValueProcessor extends ProcessorHelper implements ItemProcessorInterface
 {
-    /** @var Serializer */
-    protected $serializer;
-
     /**
-     * @Assert\NotBlank(groups={"Execution"})
-     * @Channel
-     *
-     * @var string Channel code
-     */
-    protected $channel;
-
-    /** @var ChannelManager */
-    protected $channelManager;
-
-    /** @var array Normalizer context */
-    protected $normalizerContext;
-
-    /** @var array */
-    protected $mediaAttributeTypes;
-
-    /** @var ProductBuilderInterface */
-    protected $productBuilder;
-
-    /**
-     * @var string
-     */
-    protected $language;
-
-    /**
-     * @param Serializer              $serializer
      * @param ChannelManager          $channelManager
      * @param string[]                $mediaAttributeTypes
      * @param ProductBuilderInterface $productBuilder
      */
     public function __construct(
-    Serializer $serializer, ChannelManager $channelManager, array $mediaAttributeTypes, ProductBuilderInterface $productBuilder = null
+        ChannelManager $channelManager,
+        array $mediaAttributeTypes,
+        ProductBuilderInterface $productBuilder = null
     ) {
-        $this->serializer = $serializer;
-        $this->channelManager = $channelManager;
-        $this->mediaAttributeTypes = $mediaAttributeTypes;
-        $this->productBuilder = $productBuilder;
+        parent::__construct($channelManager, $mediaAttributeTypes, $productBuilder);
     }
 
     /**
@@ -70,25 +34,25 @@ class ProductAttributeDefValueProcessor extends AbstractConfigurableStepElement 
      */
     public function process($product)
     {
-        if (null !== $this->productBuilder) {
-            $contextChannel = $this->channelManager->getChannelByCode($this->channel);
-            $this->productBuilder->addMissingProductValues($product, [$contextChannel], $contextChannel->getLocales()->toArray());
-        }
-
+        parent::process($product);
         $data['product'] = [];
 
+        return $this->fillProductData($product, $data);
+    }
+
+    protected function fillProductData($product, $data)
+    {
         $i = 0;
         foreach ($product->getValues() as $value) {
             $productName = $product->getValue('sku')->getProduct()->getLabel();
             $attrCode = '';
             $attrValue = '';
-
-            if (count($value->getOption()) > 0) {
-                $code = $value->getOption();
-                if (!empty($code)) {
-                    $value->getOption()->setLocale('en_US');
+            $options = $value->getOption();
+            if (count($options) > 0) {
+                if (!empty($options)) {
+                    $options->setLocale($this->getLanguage());
                     $attrCode = $value->getAttribute()->getCode();
-                    $attrValue = $value->getOption()->getOptionValue()->getValue();
+                    $attrValue = $options->getOptionValue()->getValue();
                 }
             }
             if (!empty($productName) && !empty($attrCode) && !empty($attrValue)) {
@@ -101,126 +65,5 @@ class ProductAttributeDefValueProcessor extends AbstractConfigurableStepElement 
         }
 
         return $data['product'];
-    }
-
-    /**
-     * @return array
-     */
-    public function getConfigurationFields()
-    {
-        return [
-            'channel' => [
-                'type'    => 'choice',
-                'options' => [
-                    'choices'  => $this->channelManager->getChannelChoices(),
-                    'required' => true,
-                    'select2'  => true,
-                    'label'    => 'pim_base_connector.export.channel.label',
-                    'help'     => 'pim_base_connector.export.channel.help',
-                ],
-            ],
-            'language' => [
-                'options' => [
-                    'required' => true,
-                    'label'    => 'aliznet_wcs_export.export.language.label',
-                    'help'     => 'aliznet_wcs_export.export.language.help',
-                ],
-            ],
-        ];
-    }
-
-    /**
-     * Set channel.
-     *
-     * @param string $channelCode Channel code
-     *
-     * @return $this
-     */
-    public function setChannel($channelCode)
-    {
-        $this->channel = $channelCode;
-
-        return $this;
-    }
-
-    /**
-     * Get channel.
-     *
-     * @return string Channel code
-     */
-    public function getChannel()
-    {
-        return $this->channel;
-    }
-
-    /**
-     * get language.
-     *
-     * @return string language
-     */
-    public function getLanguage()
-    {
-        return $this->language;
-    }
-
-    /**
-     * Set exported categorie's language.
-     * @return \Aliznet\WCSBundle\Processor\ProductAttributeValueProcessor $language language
-     */
-    public function setLanguage($language)
-    {
-        $this->language = $language;
-
-        return $this;
-    }
-
-    /**
-     * Get normalizer context.
-     *
-     * @return array $normalizerContext
-     */
-    protected function getNormalizerContext()
-    {
-        if (null === $this->normalizerContext) {
-            $this->normalizerContext = [
-                'scopeCode'   => $this->channel,
-                'localeCodes' => $this->getLocaleCodes($this->channel),
-            ];
-        }
-
-        return $this->normalizerContext;
-    }
-
-    /**
-     * Get locale codes for a channel.
-     *
-     * @param string $channelCode
-     *
-     * @return array
-     */
-    protected function getLocaleCodes($channelCode)
-    {
-        $channel = $this->channelManager->getChannelByCode($channelCode);
-
-        return $channel->getLocaleCodes();
-    }
-
-    /**
-     * Fetch medias product values.
-     *
-     * @param ProductInterface $product
-     *
-     * @return ProductValueInterface[]
-     */
-    protected function getMediaProductValues(ProductInterface $product)
-    {
-        $values = [];
-        foreach ($product->getValues() as $value) {
-            if (\in_array($value->getAttribute()->getAttributeType(), $this->mediaAttributeTypes)) {
-                $values[] = $value;
-            }
-        }
-
-        return $values;
     }
 }

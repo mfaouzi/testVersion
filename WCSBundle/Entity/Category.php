@@ -57,7 +57,7 @@ class Category extends BaseCategory implements CategoryInterface
     }
 
     /**
-     * @return boolean products
+     * @return bool products
      */
     public function hasProducts()
     {
