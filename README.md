@@ -43,19 +43,19 @@ Aliznet WCS Connector is extension that allows you to import your catalog from A
 ## Create Attributes Groups into Akeneo interface
 ```
 	Go into settings > Attribute groups > Create a new attribute group
-	*General
-	*Pricing
-	*Custom
-	*Publishing
-	*Descriptif
-	*Defining
-	*Display
+	* General
+	* Pricing
+	* Custom
+	* Publishing
+	* Descriptif
+	* Defining
+	* Display
 ```
 
 ## Import these files into Akeneo interface
 ```
-	import\wcs-family.csv in Collect > import profiles > csv_family_import
-	import\wcs-attributes.csv in Collect > import profiles > csv_attribute_import
+	**import\wcs-family.csv** in **Collect > import profiles > csv_family_import**
+	**import\wcs-attributes.csv** in **Collect > import profiles > csv_attribute_import**
 ```
 
 
