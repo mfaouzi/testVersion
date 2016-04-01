@@ -9,7 +9,7 @@ Aliznet WCS Connector is extension that allows you to import your catalog from A
 
 ### Via composer
 
-- Add into in the `require` section:
+- Add into `composer.json` in the `require` section:
 
 `"aliznet":"dev-master"`
 
@@ -17,7 +17,7 @@ Aliznet WCS Connector is extension that allows you to import your catalog from A
 ```
 	{
         "type": "vcs",
-        "url": "https://github.com/aliznet-labs/WCSConnector.git",
+        "url": "https://github.com/hicham-sabihi/aliznet_wcs_connector.git",
         "branch": "master"
     }
 ```
@@ -61,7 +61,7 @@ Aliznet WCS Connector is extension that allows you to import your catalog from A
 	php app/console cache:clear --env=prod
 ```
 
-## Create Attributes Groups into Akeneo interface
+## Create these Attributes Groups into Akeneo interface
 ```
 	Go into settings > Attribute groups > Create a new attribute group
 	* General
