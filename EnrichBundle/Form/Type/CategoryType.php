@@ -19,10 +19,6 @@ class CategoryType extends BaseCategoryType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add('display', 'switch', [
-            'required' => false,
-                ]
-        );
         $builder->add('thumbnail', 'text', [
             'required' => false,
                 ]
@@ -34,7 +30,6 @@ class CategoryType extends BaseCategoryType
         /*
          * New translatable fields added to the category view
          */
-        $this->addTranslationField($builder, 'name');
         $this->addTranslationField($builder, 'description');
         $this->addTranslationField($builder, 'longDescription');
         $this->addTranslationField($builder, 'keyword');

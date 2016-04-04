@@ -27,10 +27,10 @@ class ProductProcessor extends ProcessorHelper implements ItemProcessorInterface
     protected $localeRepository;
 
     /**
-     * @param EntityManager           $em
-     * @param Serializer              $serializer
-     * @param ChannelManager          $channelManager
-     * @param array                   $mediaAttributeTypes
+     * @param EntityManager $em
+     * @param ChannelManager $channelManager
+     * @param array $mediaAttributeTypes
+     * @param type $localeClass
      * @param ProductBuilderInterface $productBuilder
      */
     public function __construct(

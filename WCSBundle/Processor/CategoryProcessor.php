@@ -66,21 +66,22 @@ class CategoryProcessor extends BaseTransformerProcessor
     {
         $result = array();
         $item->setLocale($this->getLanguage());
+        $translation = $item->getTranslation();
         $result['GroupIdentifier'] = $item->getCode();
         if ($item->getParentCode() === null) {
             $result['TopGroup'] = 'true';
         }
         $result['ParentGroupIdentifier'] = $item->getParentCode();
         $result['Sequence'] = '1';
-        $result['Name'] = $item->getTranslation()->getName();
-        $result['ShortDescription'] = $item->getTranslation()->getDescription();
-        $result['LongDescription'] = $item->getTranslation()->getLongDescription();
+        $result['Name'] = $translation->getLabel();
+        $result['ShortDescription'] = $translation->getDescription();
+        $result['LongDescription'] = $translation->getLongDescription();
         $result['Thumbnail'] = $item->getThumbnail();
         $result['FullImage'] = $item->getFullImage();
-        $result['Keyword'] = $item->getTranslation()->getKeyword();
+        $result['Keyword'] = $translation->getKeyword();
         $result['Delete'] = '0';
 
-        $language = (String) $item->getTranslation()->getLocale();
+        $language = (String) $translation->getLocale();
         $variable = constant('Aliznet\WCSBundle\Resources\Constant\Constants::'.$language);
 
         $result['Language_id'] = $variable;

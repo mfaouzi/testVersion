@@ -7,10 +7,10 @@ use Pim\Bundle\BaseConnectorBundle\Reader\Doctrine\Reader;
 
 /**
  * Description of AttributeHelper.
- * 
- * @copyright (c) 2016, ALIZNET (www.aliznet.fr)
- * @author mmejdoubi
+ * @author    aliznet
+ * @copyright 2016 ALIZNET (www.aliznet.fr)
  */
+
 class AttributeReaderHelper extends Reader
 {
     /**
@@ -91,12 +91,11 @@ class AttributeReaderHelper extends Reader
 
     /**
      * Exclude WCS fileds from attributes export.
-     *
      * @param query $qb
-     *
+     * @param string $classe
      * @return query
      */
-    public function QueryExludedWCSFields($qb, $classe)
+    public function queryExludedWCSFields($qb, $classe)
     {
         $filename = 'exluded_atrributes.txt';
         $dir = dirname(dirname(dirname(dirname(dirname(dirname(__FILE__))))));
@@ -115,28 +114,27 @@ class AttributeReaderHelper extends Reader
 
     /**
      * Include or exclude attributes in the configuration field from export.
-     *
      * @param query $qb
-     *
+     * @param string $classe
      * @return query
      */
-    public function QueryAttributes($qb, $classe)
+    public function queryAttributes($qb, $classe)
     {
-        $include_exclude = $this->getIncludeexclude();
+        $includeExclude = $this->getIncludeexclude();
         $attributes = $this->getAttributes();
-        $attributes_config = explode(',', $attributes);
+        $attributesConfig = explode(',', $attributes);
 
         $condition = 'Where';
         if ($this->wcs) {
             $condition = 'andWhere';
         }
-        if (!empty($include_exclude)) {
-            switch ($include_exclude) {
-                case 'Exclude' :
-                    $qb->$condition($qb->expr()->orX($qb->expr()->notIn($classe.'.code', $attributes_config)));
+        if (!empty($includeExclude)) {
+            switch ($includeExclude) {
+                case 'Exclude':
+                    $qb->$condition($qb->expr()->orX($qb->expr()->notIn($classe.'.code', $attributesConfig)));
                     break;
                 case 'Include':
-                    $qb->$condition($qb->expr()->orX($qb->expr()->in($classe.'.code', $attributes_config)));
+                    $qb->$condition($qb->expr()->orX($qb->expr()->in($classe.'.code', $attributesConfig)));
                     break;
             }
         }

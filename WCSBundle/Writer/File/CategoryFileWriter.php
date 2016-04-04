@@ -181,6 +181,9 @@ class CategoryFileWriter extends BaseFileWriter
      */
     public function write(array $items)
     {
+        if (!is_dir(dirname($this->getPath()))) {
+            mkdir(dirname($this->getPath()), 0777, true);
+        }
         $this->items = array_merge($this->items, $items);
     }
 

@@ -45,9 +45,6 @@ Aliznet\WCSBundle\Entity\Category:
             column: rgt
             gedmo:
                 - treeRight
-        display:
-            type: boolean
-            nullable: true
         thumbnail:
             type: string
             length: 255

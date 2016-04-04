@@ -34,11 +34,16 @@ class AttributeReader extends AttributeReaderHelper
     protected $wcs;
 
     /**
-     * @param EntityManager $em        The entity manager
-     * @param string        $className The entity class name used
+     * 
+     * @param EntityManager $em
+     * @param type $className
+     * @param type $localeClass
      */
-    public function __construct(EntityManager $em, $className, $localeClass)
-    {
+    public function __construct(
+            EntityManager $em, 
+            $className, 
+            $localeClass
+    ){
         $this->em = $em;
         $this->className = $className;
         $this->groupNumber = 0;
@@ -79,8 +84,8 @@ class AttributeReader extends AttributeReaderHelper
                 ->createQueryBuilder('a')
                 ->leftJoin('a.translations', 'at', 'WITH', 'at.locale='.'\''.$this->getLanguage().'\'');
 
-        $this->QueryExludedWCSFields($qb, 'a');
-        $this->QueryAttributes($qb, 'a');
+        $this->queryExludedWCSFields($qb, 'a');
+        $this->queryAttributes($qb, 'a');
         $this->query = $qb->getQuery();
 
         return $this->query;
@@ -111,11 +116,11 @@ class AttributeReader extends AttributeReaderHelper
     public function getLanguages()
     {
         $languages = $this->localeRepository->getActivatedLocaleCodes();
-        $languages_choices = [];
+        $languagesChoices = [];
         foreach ($languages as $language) {
-            $languages_choices[$language] = $language;
+            $languagesChoices[$language] = $language;
         }
 
-        return $languages_choices;
+        return $languagesChoices;
     }
 }

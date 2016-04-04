@@ -23,13 +23,13 @@ aliznet_wcs_export:
     ## Import/export configuration fields (for readers, processors, writers)
     export:
         Attributes:
-            label:  attributes
+            label: Attributes
             help: Code of attributes separated by comas (example picture,pdf_description)
         includeexclude:
             label: Excluded or Included attributes
             help: Choose if you want to exclude or include the attributes in the below field.
         language:
-            label: attributes language
+            label: Language
             help: Code of attributes language to export (example en_US, fr_FR)
         excludedCategories:
             label: Excluded root categories

@@ -46,8 +46,8 @@ class AttributeValuesReader extends AttributeReaderHelper
                 ->addOrderBy('av.sortOrder');
 
         $qb = $this->query;
-        $this->QueryExludedWCSFields($qb, 'at');
-        $this->QueryAttributes($qb, 'at');
+        $this->queryExludedWCSFields($qb, 'at');
+        $this->queryAttributes($qb, 'at');
 
         $this->query = $this->query->getQuery();
 

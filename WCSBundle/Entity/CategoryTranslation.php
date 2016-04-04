@@ -15,10 +15,6 @@ class CategoryTranslation extends BaseCategoryTranslation
     /**
      * @var string
      */
-    protected $name;
-    /**
-     * @var string
-     */
     protected $description;
     /**
      * @var string
@@ -28,14 +24,6 @@ class CategoryTranslation extends BaseCategoryTranslation
      * @var string
      */
     protected $keyword;
-
-    /**
-     * @return string
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
 
     /**
      * @return string
@@ -59,18 +47,6 @@ class CategoryTranslation extends BaseCategoryTranslation
     public function getKeyword()
     {
         return $this->keyword;
-    }
-
-    /**
-     * @param type $name
-     *
-     * @return \Aliznet\WCSBundle\Entity\CategoryTranslation
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-
-        return $this;
     }
 
     /**

@@ -3,13 +3,10 @@
 namespace Aliznet\WCSBundle\Writer\File;
 
 use Akeneo\Component\Buffer\BufferFactory;
-use Pim\Bundle\BaseConnectorBundle\Validator\Constraints\Channel;
 use Pim\Bundle\CatalogBundle\Manager\ChannelManager;
-use Pim\Bundle\CatalogBundle\Manager\MediaManager;
 use Pim\Bundle\CatalogBundle\Model\AbstractProductMedia;
 use Pim\Component\Connector\Writer\File\CsvWriter as BaseCsvWriter;
 use Pim\Component\Connector\Writer\File\FilePathResolverInterface;
-use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * CSV Product Writer.
@@ -82,13 +79,13 @@ class CsvProductWriter extends BaseCsvWriter
     {
         $products = [];
 
-        if (!is_dir(dirname($this->getPath()))) {
-            mkdir(dirname($this->getPath()), 0777, true);
-        }
-
         foreach ($items as $item) {
             $item['product'] = $this->formatMetricsColumns($item['product']);
             $products[] = $item['product'];
+        }
+
+        if (!is_dir(dirname($this->getPath()))) {
+            mkdir(dirname($this->getPath()), 0777, true);
         }
 
         $this->items = array_merge($this->items, $products);

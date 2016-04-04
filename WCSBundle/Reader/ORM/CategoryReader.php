@@ -162,6 +162,7 @@ class CategoryReader extends Reader
                 'options' => array(
                     'choices'  => $this->getLanguages(),
                     'required' => true,
+                    'select2'  => true,
                     'label'    => 'aliznet_wcs_export.export.language.label',
                     'help'     => 'aliznet_wcs_export.export.language.help',
                 ),

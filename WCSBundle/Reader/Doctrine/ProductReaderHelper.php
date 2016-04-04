@@ -16,9 +16,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Class ProductReaderHelper.
- * 
- * @copyright (c) 2016, ALIZNET (www.aliznet.fr)
- * @author mmejdoubi
+ * @author    aliznet
+ * @copyright 2016 ALIZNET (www.aliznet.fr)
  */
 class ProductReaderHelper extends AbstractConfigurableStepElement implements ProductReaderInterface
 {
@@ -121,15 +120,23 @@ class ProductReaderHelper extends AbstractConfigurableStepElement implements Pro
     protected $language;
 
     /**
+     * 
      * @param ProductRepositoryInterface $repository
-     * @param ChannelManager             $channelManager
-     * @param CompletenessManager        $completenessManager
-     * @param MetricConverter            $metricConverter
-     * @param EntityManager              $entityManager
-     * @param bool                       $missingCompleteness
+     * @param ChannelManager $channelManager
+     * @param type $localeClass
+     * @param CompletenessManager $completenessManager
+     * @param MetricConverter $metricConverter
+     * @param EntityManager $entityManager
+     * @param type $missingCompleteness
      */
     public function __construct(
-    ProductRepositoryInterface $repository, ChannelManager $channelManager, $localeClass, CompletenessManager $completenessManager, MetricConverter $metricConverter, EntityManager $entityManager, $missingCompleteness = true
+            ProductRepositoryInterface $repository, 
+            ChannelManager $channelManager, 
+            $localeClass, 
+            CompletenessManager $completenessManager, 
+            MetricConverter $metricConverter, 
+            EntityManager $entityManager, 
+            $missingCompleteness = true
     ) {
         $this->entityManager = $entityManager;
         $this->repository = $repository;
@@ -359,60 +366,19 @@ class ProductReaderHelper extends AbstractConfigurableStepElement implements Pro
 
         return $this;
     }
-
-    /**
-     * Get the date use to filter the product collection.
-     *
-     * @return string
-     */
-    protected function getDateFilter()
-    {
-        $q = $this->entityManager->createQuery("select MAX(je.endTime) from Akeneo\Component\Batch\Model\JobExecution je where je.jobInstance = ".$this->getBatchExportID());
-
-        $lastJobDate = $q->getOneOrNullResult();
-
-        $date = (isset($lastJobDate[1]) && $lastJobDate[1] != null) ? $lastJobDate[1] : '1970-01-01 01:00:00';
-
-        return ($this->getExportFrom() != '') ? $this->getExportFrom() : $date;
-    }
-
-    /**
-     * Get next products batch from DB.
-     *
-     * @return \ArrayIterator
-     */
-    protected function getNextProducts()
-    {
-        $this->entityManager->clear();
-        $products = null;
-
-        if (null === $this->ids) {
-            $this->ids = $this->getIds();
-        }
-
-        $currentIds = array_slice($this->ids, $this->offset, $this->limit);
-
-        if (!empty($currentIds)) {
-            $items = $this->repository->findByIds($currentIds);
-            $products = new \ArrayIterator($items);
-            $this->offset += $this->limit;
-        }
-
-        return $products;
-    }
-
+    
     /**
      * @return array
      */
     public function getLanguages()
     {
         $languages = $this->localeRepository->getActivatedLocaleCodes();
-        $languages_choices = [];
+        $languagesChoices = [];
         foreach ($languages as $language) {
-            $languages_choices[$language] = $language;
+            $languagesChoices[$language] = $language;
         }
 
-        return $languages_choices;
+        return $languagesChoices;
     }
 
     /**
@@ -465,6 +431,48 @@ class ProductReaderHelper extends AbstractConfigurableStepElement implements Pro
                 ),
             ),
         );
+    }
+
+
+    /**
+     * Get the date use to filter the product collection.
+     *
+     * @return string
+     */
+    protected function getDateFilter()
+    {
+        $q = $this->entityManager->createQuery("select MAX(je.endTime) from Akeneo\Component\Batch\Model\JobExecution je where je.jobInstance = ".$this->getBatchExportID());
+
+        $lastJobDate = $q->getOneOrNullResult();
+
+        $date = (isset($lastJobDate[1]) && $lastJobDate[1] != null) ? $lastJobDate[1] : '1970-01-01 01:00:00';
+
+        return ($this->getExportFrom() != '') ? $this->getExportFrom() : $date;
+    }
+
+    /**
+     * Get next products batch from DB.
+     *
+     * @return \ArrayIterator
+     */
+    protected function getNextProducts()
+    {
+        $this->entityManager->clear();
+        $products = null;
+
+        if (null === $this->ids) {
+            $this->ids = $this->getIds();
+        }
+
+        $currentIds = array_slice($this->ids, $this->offset, $this->limit);
+
+        if (!empty($currentIds)) {
+            $items = $this->repository->findByIds($currentIds);
+            $products = new \ArrayIterator($items);
+            $this->offset += $this->limit;
+        }
+
+        return $products;
     }
 
     /**

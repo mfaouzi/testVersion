@@ -24,7 +24,7 @@ class AttributeProcessor extends ProcessorHelper implements ItemProcessorInterfa
       * @param string[]                $mediaAttributeTypes
       * @param ProductBuilderInterface $productBuilder
       */
-     public function __construct(
+    public function __construct(
         ChannelManager $channelManager,
         array $mediaAttributeTypes,
         ProductBuilderInterface $productBuilder = null

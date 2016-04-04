@@ -35,9 +35,6 @@ class Category extends BaseCategory implements CategoryInterface
     /** @var \DateTime */
     protected $created;
 
-    /** @var \Integer */
-    protected $display;
-
     /** @var \String for small images location */
     protected $thumbnail;
 
@@ -225,14 +222,6 @@ class Category extends BaseCategory implements CategoryInterface
     }
 
     /**
-     * @return Description Integer.
-     */
-    public function getDisplay()
-    {
-        return $this->display;
-    }
-
-    /**
      * Returns the Thumbnail location related to category.
      *
      * @return string
@@ -240,20 +229,6 @@ class Category extends BaseCategory implements CategoryInterface
     public function getThumbnail()
     {
         return $this->thumbnail;
-    }
-
-    /**
-     * Set Display.
-     *
-     * @param string $display
-     *
-     * @return CategoryInterface
-     */
-    public function setDisplay($display)
-    {
-        $this->display = $display;
-
-        return $this;
     }
 
     /**

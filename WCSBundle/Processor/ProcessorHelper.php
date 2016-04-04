@@ -8,10 +8,10 @@ use Pim\Component\Catalog\Builder\ProductBuilderInterface;
 use Pim\Component\Catalog\Model\ProductInterface;
 use Pim\Component\Catalog\Model\ProductValueInterface;
 
-/* 
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * Processor Helper
+ * @author    aliznet
+ * @copyright 2016 ALIZNET (www.aliznet.fr)
  */
 
 class ProcessorHelper extends AbstractConfigurableStepElement
@@ -51,6 +51,9 @@ class ProcessorHelper extends AbstractConfigurableStepElement
         $this->productBuilder = $productBuilder;
     }
 
+    /**
+     * @param product $product
+     */
     public function process($product)
     {
         if (null !== $this->productBuilder) {
@@ -120,8 +123,8 @@ class ProcessorHelper extends AbstractConfigurableStepElement
 
     /**
      * Set exported categorie's language.
-     *
-     * @return string $language language
+     * @param type $language
+     * @return \Aliznet\WCSBundle\Processor\ProcessorHelper
      */
     public function setLanguage($language)
     {
@@ -172,9 +175,8 @@ class ProcessorHelper extends AbstractConfigurableStepElement
     {
         $values = [];
         foreach ($product->getValues() as $value) {
-            if (in_array(
-                            $value->getAttribute()->getAttributeType(), $this->mediaAttributeTypes
-                    )) {
+            if (\in_array($value->getAttribute()->getAttributeType(), $this->mediaAttributeTypes)) 
+            {
                 $values[] = $value;
             }
         }

@@ -25,7 +25,7 @@ class AttributeValuesProcessor extends ProcessorHelper implements ItemProcessorI
       * @param string[]                $mediaAttributeTypes
       * @param ProductBuilderInterface $productBuilder
       */
-     public function __construct(
+    public function __construct(
         ChannelManager $channelManager,
         array $mediaAttributeTypes,
         ProductBuilderInterface $productBuilder = null
@@ -42,7 +42,8 @@ class AttributeValuesProcessor extends ProcessorHelper implements ItemProcessorI
     {
         $result = array();
         $i = 0;
-        foreach ($item->getOptionValues() as $value) {
+        foreach ($item->getOptionValues() as $value) 
+        {
             $result[$i]['Identifier'] = $item->getAttribute()->getCode();
             $result[$i]['ValueIdentifier'] = $item->getCode();
             $result[$i]['Sequence'] = 1;
