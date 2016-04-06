@@ -9,7 +9,7 @@ use Pim\Component\Catalog\Builder\ProductBuilderInterface;
 use Symfony\Component\Serializer\Serializer;
 
 /**
- * Product Processor.
+ * Items Processor.
  *
  * @author    aliznet
  * @copyright 2016 ALIZNET (www.aliznet.fr)
