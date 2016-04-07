@@ -1,4 +1,4 @@
-# Aliznet WCS Connector
+# Aliznet WCS Connector for Akeneo
 
 ![alt text][logo]
 [logo]: http://www.aliznet.fr/wp-content/themes/aliznet/img/logo.png "AliznetConnector : "
