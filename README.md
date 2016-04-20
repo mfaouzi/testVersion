@@ -39,7 +39,7 @@ Aliznet WCS Connector is extension that allows you to import your catalog from A
 - Add those two lines from your app/AppKernel.php file:
 ```
 	$bundles[] = new Aliznet\WCSBundle\AliznetWCSBundle();
-	$bundles[] = new new Aliznet\EnrichBundle\AliznetEnrichBundle();
+	$bundles[] = new Aliznet\EnrichBundle\AliznetEnrichBundle();
 ```
 
 ## Update your config.yml
@@ -62,7 +62,7 @@ Aliznet WCS Connector is extension that allows you to import your catalog from A
 ```
 
 ## Create these Attributes Groups into Akeneo interface
-```
+```     In order to export informations usable by websphere commerce, there are groups of attributes that must be added. 
 	Go into settings > Attribute groups > Create a new attribute group
 	* General
 	* Pricing
