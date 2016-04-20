@@ -27,13 +27,6 @@ Aliznet WCS Connector is extension that allows you to import your catalog from A
 	php composer.phar update aliznet
 ```
 
-## Update Akeneo database
-
-- apply the script to your Akeneo database :
-```
-	WCSBundle/Resources/sql/mapping_migration.schema.sql
-```
-
 ## Update your AppKernel.php
 
 - Add those two lines from your app/AppKernel.php file:
@@ -59,6 +52,13 @@ Aliznet WCS Connector is extension that allows you to import your catalog from A
 ```
 	php app/console doctrine:schema:update --force
 	php app/console cache:clear --env=prod
+```
+
+## Update Akeneo database
+
+- apply the script to your Akeneo database :
+```
+	WCSBundle/Resources/sql/mapping_migration.schema.sql
 ```
 
 ## Create these Attributes Groups into Akeneo interface
