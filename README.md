@@ -9,11 +9,11 @@ Aliznet WCS Connector is extension that allows you to import your catalog from A
 
 ### Via composer : 
 
-- Add into in the `require` section:
+- Add this line to the `require` section in your composer.json:
 
-`"aliznet":"dev-master"`
+`"aliznet/akeneo-websphere-connector":"dev-master"`
 
-- Add into the `repositories` section:
+- Add this part to the `repositories` section:
 ```
 	{
         "type": "vcs",
@@ -24,20 +24,22 @@ Aliznet WCS Connector is extension that allows you to import your catalog from A
 
 - Execute update composer.phar :
 ```
-	php composer.phar update aliznet
+	php composer.phar update  aliznet/akeneo-websphere-connector
 ```
 
 ## Update your AppKernel.php
 
-- Add those two lines from your app/AppKernel.php file:
+- Add these bundles to your app/AppKernel.php file:
 ```
-	$bundles[] = new Aliznet\WCSBundle\AliznetWCSBundle();
-	$bundles[] = new Aliznet\EnrichBundle\AliznetEnrichBundle();
+	$bundles = [
+	        new Aliznet\WCSBundle\AliznetWCSBundle(),
+            new Aliznet\EnrichBundle\AliznetEnrichBundle(),
+        ];
 ```
 
 ## Update your config.yml
 
-- Add these lines from your app/config/config.yml file after this line **akeneo_storage_utils:** :
+- Add these lines from your app/config/config.yml file right after this line **akeneo_storage_utils:** :
 ```
 	mapping_overrides:
 		-
