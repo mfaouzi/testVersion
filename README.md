@@ -56,13 +56,6 @@ Aliznet WCS Connector is extension that allows you to import your catalog from A
 	php app/console cache:clear --env=prod
 ```
 
-## Update Akeneo database
-
-- apply the script to your Akeneo database :
-```
-	WCSBundle/Resources/sql/mapping_migration.schema.sql
-```
-
 ## Create these Attributes Groups into Akeneo interface
 ```    
     In order to export informations usable by websphere commerce, there are groups of attributes that must be added. 
