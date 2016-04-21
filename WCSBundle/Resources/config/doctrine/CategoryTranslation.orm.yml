@@ -1,7 +1,7 @@
 # /src/Aliznet/WCSBundle/Resources/config/doctrine/CategoryTranslation.orm.yml
 Aliznet\WCSBundle\Entity\CategoryTranslation:
     type: entity
-    table: Category_Translation
+    table: pim_catalog_category_translation
     fields:
         description:
             type: string
