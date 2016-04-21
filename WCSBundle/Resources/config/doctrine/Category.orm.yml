@@ -1,7 +1,7 @@
 # /src/Aliznet/WCSBundle/Resources/config/doctrine/Category.orm.yml
 Aliznet\WCSBundle\Entity\Category:
     type: entity
-    table: Category
+    table: pim_catalog_category
     changeTrackingPolicy: DEFERRED_EXPLICIT
     repositoryClass: Akeneo\Bundle\ClassificationBundle\Doctrine\ORM\Repository\CategoryRepository
     uniqueConstraints:
